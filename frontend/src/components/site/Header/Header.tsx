@@ -8,18 +8,17 @@ import {
   ROUTE_STAFFS_LIST,
 } from "../../../constants/routes";
 
-export default function Header() {
-  const links = [
-    { name: "Keychains", href: ROUTE_KEYCHAINS_LIST, isActive: true },
-    { name: "Groups", href: ROUTE_GROUPS_LIST, isActive: false },
-    { name: "Locks", href: ROUTE_LOCKS_LIST, isActive: false },
-    { name: "Staffs", href: ROUTE_STAFFS_LIST, isActive: false },
-  ];
+const links = [
+  { name: "Keychains", href: ROUTE_KEYCHAINS_LIST, prefix: "/keychains" },
+  { name: "Staffs", href: ROUTE_STAFFS_LIST, prefix: "/staffs" },
+];
 
+export default function Header() {
   return (
     <nav className="fixed w-full bg-slate-900 h-14 flex items-stretch px-4 shadow-lg border-b-4 border-red-600">
       {links.map((item, index) => {
-        const { name, href, isActive } = item;
+        const { name, href } = item;
+        const isActive = false;
         return (
           <a
             href={href}
