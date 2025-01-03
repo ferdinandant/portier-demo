@@ -17,7 +17,7 @@ export default function Header() {
   ];
 
   return (
-    <nav className="fixed w-full bg-slate-900 h-14 flex items-stretch px-2 shadow-lg gap-1 border-b-4 border-red-600">
+    <nav className="fixed w-full bg-slate-900 h-14 flex items-stretch px-4 shadow-lg border-b-4 border-red-600">
       {links.map((item, index) => {
         const { name, href, isActive } = item;
         return (
@@ -26,7 +26,7 @@ export default function Header() {
             key={index}
             className={classNames(
               "font-semibold text-slate-100 px-4 flex items-center transition-all hover:bg-slate-800",
-              isActive && "bg-slate-800"
+              isActive && "bg-red-800 hover:bg-red-800"
             )}
           >
             {name}
