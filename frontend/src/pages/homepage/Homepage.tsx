@@ -1,5 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { ROUTE_KEYCHAINS_LIST } from "../../constants/routes";
 
-type Props = {};
+export default function Homepage() {
+  useEffect(() => {
+    window.location.href = ROUTE_KEYCHAINS_LIST;
+  });
 
-export default function Homepage(props: Props) {}
+  return null;
+}
