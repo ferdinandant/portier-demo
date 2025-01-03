@@ -13,5 +13,7 @@ code {
 }
 
 main {
-  margin-top: 72px;
+  margin-top: 92px;
+  max-width: 720px;
+  margin-inline: auto;
 }

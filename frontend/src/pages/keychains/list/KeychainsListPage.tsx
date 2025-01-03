@@ -1,4 +1,6 @@
 import React from "react";
+import { Input } from "@chakra-ui/react";
+
 import Header from "../../../components/site/Header/Header";
 
 export default function KeychainsListPage() {
@@ -8,7 +10,15 @@ export default function KeychainsListPage() {
         <Header />
       </header>
 
-      <main>KeychainsListPage</main>
+      <main>
+        {/* Filter section */}
+        <section>
+          <Input variant="outline" placeholder="Filter by ..." />
+        </section>
+
+        {/* Table section*/}
+        <section></section>
+      </main>
     </>
   );
 }
