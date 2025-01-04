@@ -5,6 +5,7 @@ import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
 import {
   ROUTE_KEYCHAINS_CREATE,
   ROUTE_KEYCHAINS_LIST,
+  ROUTE_KEYCHAINS_VIEW,
   ROUTE_STAFFS_LIST,
 } from "./constants/routes";
 
@@ -12,6 +13,7 @@ import {
 import Homepage from "./pages/homepage/Homepage";
 import KeychainsListPage from "./pages/keychains/list/KeychainsListPage";
 import StaffsListPage from "./pages/staffs/list/StaffsListPage";
+import KeychainsViewPage from "./pages/keychains/view/KeychainsViewPage";
 
 function App() {
   return (
@@ -20,6 +22,7 @@ function App() {
         <Routes>
           <Route path={"/"} element={<Homepage />} />
           <Route path={ROUTE_KEYCHAINS_LIST} element={<KeychainsListPage />} />
+          <Route path={ROUTE_KEYCHAINS_VIEW} element={<KeychainsViewPage />} />
           <Route path={ROUTE_STAFFS_LIST} element={<StaffsListPage />} />
         </Routes>
       </BrowserRouter>

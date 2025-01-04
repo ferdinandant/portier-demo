@@ -66,6 +66,11 @@ func main() {
 			return keychains.CreateKeychain(mysqlConfig, reqJson)
 		})
 	})
+	r.POST("/api/keychains/view", func(c *gin.Context) {
+		wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
+			return keychains.ViewKeychain(mysqlConfig, reqJson)
+		})
+	}) //
 
 	// ================================================================================
 	// SERVE
