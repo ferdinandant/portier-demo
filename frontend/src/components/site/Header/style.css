@@ -1,0 +1,30 @@
+.header-nav {
+  background-color: #1e293b;
+  color: #f1f5f9;
+  position: fixed;
+  top: 0;
+  height: 60px;
+  width: 100%;
+  box-shadow: 0 0 10px #64748b;
+  display: flex;
+  align-items: center;
+  padding-inline: 16px;
+  gap: 8px;
+}
+
+.header-nav a {
+  display: flex;
+  align-items: center;
+  padding-inline: 1rem;
+  transition: all 100ms;
+  border-radius: 4px;
+  padding-block: 8px;
+  font-weight: 600;
+}
+.header-nav a:hover {
+  background-color: #334155;
+}
+.header-nav a.active,
+.header-nav a.active:hover {
+  background-color: #0f172a;
+}

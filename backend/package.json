@@ -1,0 +1,8 @@
+{
+  "name": "@portier-demo/backend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "go run ."
+  }
+}
