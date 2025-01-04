@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Box, Button, VStack, Input } from "@chakra-ui/react";
+import { useState } from "react";
+import { Box, Button } from "@chakra-ui/react";
 
 import {
   DialogBody,
@@ -10,8 +10,8 @@ import {
   DialogTitle,
 } from "../../../components/chakra/Dialog/Dialog";
 import Alert, { AlertStatus } from "../../../components/ui/Alert/Alert";
-import { Field } from "../../../components/chakra/Field/Field";
-import { API_KEYCHAINS_UPDATE } from "../../../constants/api";
+import { API_KEYCHAINS_DELETE } from "../../../constants/api";
+import { ROUTE_KEYCHAINS_LIST } from "../../../constants/routes";
 
 type FormState = "ready" | "loading" | "done";
 
@@ -19,15 +19,13 @@ type Props = {
   keychainData: any;
   isOpen: boolean;
   onClose?: () => any;
-  onSuccess?: () => any;
 };
 
-export default function UpdateKeychainModal(props: Props) {
-  const { isOpen, onClose, onSuccess, keychainData } = props;
+export default function DeleteKeychainModal(props: Props) {
+  const { isOpen, onClose, keychainData } = props;
 
   // Form state
   const [formState, setFormState] = useState<FormState>("ready");
-  const [description, setDescription] = useState("");
 
   // Alert state
   const [alertStatus, setAlertStatus] = useState<AlertStatus>();
@@ -38,21 +36,14 @@ export default function UpdateKeychainModal(props: Props) {
   // Handlers
   // ------------------------------------------------------------
 
-  const resetForm = () => {
-    // Reset form
-    setFormState("ready");
-    setAlertStatus(undefined);
-    // Reset states
-    if (keychainData) {
-      setDescription(keychainData.Description);
-    }
-  };
-
   const handleClose = () => {
     if (onClose) {
       onClose();
-      resetForm();
     }
+  };
+
+  const handleClickReturnToHome = () => {
+    document.location.href = ROUTE_KEYCHAINS_LIST;
   };
 
   const handleSubmit = async () => {
@@ -63,14 +54,13 @@ export default function UpdateKeychainModal(props: Props) {
       // Mark loading
       setFormState("loading");
       setAlertStatus("info");
-      setAlertTitle("Updating keychain ...");
+      setAlertTitle("Deleting keychain ...");
       setAlertContent(null);
       // Send request
-      const res = await fetch(API_KEYCHAINS_UPDATE, {
+      const res = await fetch(API_KEYCHAINS_DELETE, {
         method: "POST",
         body: JSON.stringify({
           keychainID: keychainData.KeychainID,
-          description,
         }),
       });
       const decodedRes = await res.json();
@@ -79,34 +69,17 @@ export default function UpdateKeychainModal(props: Props) {
       } else {
         setFormState("done");
         setAlertStatus("success");
-        setAlertTitle("Successfully updated the keychain");
+        setAlertTitle("Successfully deleted the keychain");
         setAlertContent(null);
-        if (onSuccess) {
-          onSuccess();
-        }
       }
     } catch (err) {
       const errContent = Array.isArray(err) ? err : (err as any).message;
       setFormState("ready");
       setAlertStatus("error");
-      setAlertTitle("Failed updating keychain");
+      setAlertTitle("Failed deleting the keychain");
       setAlertContent(errContent);
     }
   };
-
-  const handleChangeDescription = (e: any) => {
-    if (formState === "ready") {
-      setDescription(e.target.value);
-    }
-  };
-
-  // ------------------------------------------------------------
-  // Effects
-  // ------------------------------------------------------------
-
-  useEffect(() => {
-    resetForm();
-  }, [isOpen]);
 
   // ------------------------------------------------------------
   // Render
@@ -121,7 +94,7 @@ export default function UpdateKeychainModal(props: Props) {
       <DialogContent>
         {/* Header */}
         <DialogHeader>
-          <DialogTitle>Update keychain</DialogTitle>
+          <DialogTitle>Delete keychain</DialogTitle>
         </DialogHeader>
 
         {/* Body */}
@@ -136,38 +109,28 @@ export default function UpdateKeychainModal(props: Props) {
             </Box>
           )}
           {/* Form */}
-          <VStack alignItems="stretch">
-            <VStack alignItems="stretch" gap={4}>
-              <Field label="Keychain ID" required>
-                <Input
-                  disabled
-                  placeholder=""
-                  value={keychainData.KeychainID}
-                />
-              </Field>
-            </VStack>
-            <VStack alignItems="stretch" gap={4}>
-              <Field label="Description" required>
-                <Input
-                  placeholder=""
-                  value={description}
-                  onChange={handleChangeDescription}
-                />
-              </Field>
-            </VStack>
-          </VStack>
+          <p>
+            Are you sure you want to delete keychain "{keychainData.KeychainID}"
+            ({keychainData.Description}) along with its copies?
+          </p>
         </DialogBody>
 
         {/* Footer */}
         <DialogFooter>
-          {formState === "done" && <Button onClick={handleClose}>Close</Button>}
+          {formState === "done" && (
+            <Button onClick={handleClickReturnToHome}>Return to home</Button>
+          )}
           {formState !== "done" && (
             <>
               <Button variant="outline" onClick={handleClose}>
                 Cancel
               </Button>
-              <Button onClick={handleSubmit} disabled={formState !== "ready"}>
-                Update
+              <Button
+                colorPalette="red"
+                onClick={handleSubmit}
+                disabled={formState !== "ready"}
+              >
+                Delete
               </Button>
             </>
           )}

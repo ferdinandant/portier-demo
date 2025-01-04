@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
 import { Card, Box } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 import "./style.css";
 
 type Props = {
@@ -8,13 +9,13 @@ type Props = {
 };
 
 export default function SelectableCard(props: Props) {
-  const { href, children } = props;
+  const { href = "#", children } = props;
 
   return (
-    <a className="selectable-card" href={href} style={{ width: "100%" }}>
+    <Link to={href} className="selectable-card" style={{ width: "100%" }}>
       <Card.Root style={{ backgroundColor: "transparent", borderRadius: 4 }}>
         <Box p={4}>{children}</Box>
       </Card.Root>
-    </a>
+    </Link>
   );
 }

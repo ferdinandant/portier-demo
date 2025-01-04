@@ -14,15 +14,16 @@ import Header from "../../../components/site/Header/Header";
 import Alert, { AlertStatus } from "../../../components/ui/Alert/Alert";
 import SelectableCard from "../../../components/ui/SelectableCard/SelectableCard";
 import Pagination from "../../../components/ui/Pagination/Pagination";
-import debounce from "../../../utils/timing/debounce";
-import { API_KEYCHAINS_VIEW } from "../../../constants/api";
-import parseURL from "../../../utils/url/parseURL";
-import { ROUTE_KEYCHAINS_VIEW } from "../../../constants/routes";
 import UpdateKeychainModal from "./UpdateKeychainModal";
+import DeleteKeychainModal from "./DeleteKeychainModal";
 
 // Constants
+import { API_KEYCHAINS_VIEW } from "../../../constants/api";
+import { ROUTE_KEYCHAINS_VIEW } from "../../../constants/routes";
 
 // Utils
+import debounce from "../../../utils/timing/debounce";
+import parseURL from "../../../utils/url/parseURL";
 
 // ================================================================================
 // MAIN
@@ -52,6 +53,8 @@ export default function KeychainsViewPage() {
 
   // Modal state
   const [isUpdateKeychainModalOpen, setIsUpdateKeychainModalOpen] =
+    useState(false);
+  const [isDeleteKeychainModalOpen, setIsDeleteKeychainModalOpen] =
     useState(false);
 
   // ------------------------------------------------------------
@@ -188,7 +191,12 @@ export default function KeychainsViewPage() {
               >
                 Edit
               </Button>
-              <Button colorPalette="red">Delete</Button>
+              <Button
+                colorPalette="red"
+                onClick={() => setIsDeleteKeychainModalOpen(true)}
+              >
+                Delete
+              </Button>
             </Card.Footer>
           )}
         </Card.Root>
@@ -212,6 +220,11 @@ export default function KeychainsViewPage() {
           isOpen={isUpdateKeychainModalOpen}
           onClose={() => setIsUpdateKeychainModalOpen(false)}
           onSuccess={() => fetchKeychainData()}
+        />
+        <DeleteKeychainModal
+          keychainData={keychainData}
+          isOpen={isDeleteKeychainModalOpen}
+          onClose={() => setIsDeleteKeychainModalOpen(false)}
         />
       </main>
     </>
