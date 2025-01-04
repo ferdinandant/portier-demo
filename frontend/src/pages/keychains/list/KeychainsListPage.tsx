@@ -1,9 +1,15 @@
-import React from "react";
-import { Input } from "@chakra-ui/react";
+import React, { ChangeEvent, useState } from "react";
+import { Input, Button, HStack } from "@chakra-ui/react";
 
 import Header from "../../../components/site/Header/Header";
 
 export default function KeychainsListPage() {
+  const [filterValue, setFilterValue] = useState("");
+
+  const handleFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFilterValue(e.target.value);
+  };
+
   return (
     <>
       <header>
@@ -13,7 +19,15 @@ export default function KeychainsListPage() {
       <main>
         {/* Filter section */}
         <section>
-          <Input variant="outline" placeholder="Filter by ..." />
+          <HStack>
+            <Input
+              variant="outline"
+              placeholder="Filter by ..."
+              onChange={handleFilterChange}
+              value={filterValue}
+            />
+            <Button colorPalette="green">Create</Button>
+          </HStack>
         </section>
 
         {/* Table section*/}

@@ -1,8 +1,6 @@
--- Create database
 CREATE DATABASE IF NOT EXISTS portier_demo;
 USE portier_demo;
 
--- Create tables
 CREATE TABLE IF NOT EXISTS keychains (
     keychain_id VARCHAR(255) PRIMARY KEY,
     description VARCHAR(255)
