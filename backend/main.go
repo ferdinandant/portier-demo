@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/ferdinandant/portier-demo/keychains"
+	"github.com/ferdinandant/portier-demo/keycopies"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-sql-driver/mysql"
@@ -79,6 +80,13 @@ func main() {
 	r.POST("/api/keychains/delete", func(c *gin.Context) {
 		wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
 			return keychains.DeleteKeychain(mysqlConfig, reqJson)
+		})
+	})
+
+	// Key copy handlers
+	r.POST("/api/keycopies/list-by-keychain", func(c *gin.Context) {
+		wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
+			return keycopies.ListCopiesByKeychain(mysqlConfig, reqJson)
 		})
 	})
 

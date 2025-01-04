@@ -27,7 +27,7 @@ func CreateKeychain(mysqlConfig mysql.Config, reqJson []byte) (*CreateKeychainRe
 
 	// Validate
 	if reqObj.Description == "" {
-		return nil, errors.New("description is required")
+		return nil, errors.New("argument Description is required")
 	}
 
 	// Open connection
