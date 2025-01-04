@@ -18,6 +18,7 @@ import debounce from "../../../utils/timing/debounce";
 import { API_KEYCHAINS_VIEW } from "../../../constants/api";
 import parseURL from "../../../utils/url/parseURL";
 import { ROUTE_KEYCHAINS_VIEW } from "../../../constants/routes";
+import UpdateKeychainModal from "./UpdateKeychainModal";
 
 // Constants
 
@@ -48,6 +49,10 @@ export default function KeychainsViewPage() {
   const [isKeyCopiesDataLoading, setIsKeyCopiesDataLoading] = useState(true);
   const [keychainData, setKeychainData] = useState<any>();
   const [keyCopiedData, setKeyCopiesData] = useState<any>();
+
+  // Modal state
+  const [isUpdateKeychainModalOpen, setIsUpdateKeychainModalOpen] =
+    useState(false);
 
   // ------------------------------------------------------------
   // Handlers
@@ -177,7 +182,12 @@ export default function KeychainsViewPage() {
           </Card.Body>
           {!isKeychainDataLoading && keychainData && (
             <Card.Footer justifyContent="flex-end">
-              <Button variant="outline">Edit</Button>
+              <Button
+                variant="outline"
+                onClick={() => setIsUpdateKeychainModalOpen(true)}
+              >
+                Edit
+              </Button>
               <Button colorPalette="red">Delete</Button>
             </Card.Footer>
           )}
@@ -196,7 +206,13 @@ export default function KeychainsViewPage() {
           />
         </Box>
 
-        {/* Table section*/}
+        {/* Modals */}
+        <UpdateKeychainModal
+          keychainData={keychainData}
+          isOpen={isUpdateKeychainModalOpen}
+          onClose={() => setIsUpdateKeychainModalOpen(false)}
+          onSuccess={() => fetchKeychainData()}
+        />
       </main>
     </>
   );

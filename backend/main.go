@@ -70,7 +70,12 @@ func main() {
 		wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
 			return keychains.ViewKeychain(mysqlConfig, reqJson)
 		})
-	}) //
+	})
+	r.POST("/api/keychains/update", func(c *gin.Context) {
+		wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
+			return keychains.UpdateKeychain(mysqlConfig, reqJson)
+		})
+	})
 
 	// ================================================================================
 	// SERVE

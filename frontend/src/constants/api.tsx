@@ -10,6 +10,10 @@ export const API_KEYCHAINS_VIEW = `${API_HOST}/api/keychains/view`;
 
 export const API_KEYCHAINS_CREATE = `${API_HOST}/api/keychains/create`;
 
+export const API_KEYCHAINS_UPDATE = `${API_HOST}/api/keychains/update`;
+
+export const API_KEYCHAINS_DELETE = `${API_HOST}/api/keychains/delete`;
+
 // ================================================================================
 // KEYCOPIES
 // ================================================================================
