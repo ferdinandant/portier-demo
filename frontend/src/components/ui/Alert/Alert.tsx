@@ -1,9 +1,16 @@
 import React from "react";
-import { Alert as ChakraAlert, List } from "@chakra-ui/react";
-import { Item } from "@chakra-ui/react/dist/types/components/accordion/namespace";
+import { Alert as ChakraAlert } from "@chakra-ui/react";
+
+export type AlertStatus =
+  | "error"
+  | "info"
+  | "warning"
+  | "success"
+  | "neutral"
+  | undefined;
 
 type Props = {
-  status: "error" | "info" | "warning" | "success" | "neutral" | undefined;
+  status: AlertStatus;
   title: string | undefined | null;
   content: any;
 };
@@ -30,7 +37,7 @@ export default function Alert(props: Props) {
   // Render
   return (
     <ChakraAlert.Root
-      status="error"
+      status={status}
       style={{ flexDirection: "column", gap: 2 }}
     >
       {/* Title */}

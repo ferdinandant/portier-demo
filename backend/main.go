@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"io"
-	"net/http"
 	"os"
 
 	"github.com/ferdinandant/portier-demo/keychains"
@@ -26,10 +25,10 @@ func main() {
 
 	// Read mysql secret
 	mysqlSecretFile, err := os.Open("./secrets/mysql.json")
-	defer mysqlSecretFile.Close()
 	if err != nil {
 		panic("mysql secret file is not found")
 	}
+	defer mysqlSecretFile.Close()
 	mysqlSecretBytes, _ := io.ReadAll(mysqlSecretFile)
 	// Parse config
 	var mysqlSecret MySqlSecret
@@ -56,31 +55,21 @@ func main() {
 	r := gin.Default()
 	r.Use(cors.Default())
 
+	// Keychain handlers
 	r.POST("/api/keychains/list", func(c *gin.Context) {
-		reqJson, err := io.ReadAll(c.Request.Body)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"success": false,
-				"errors":  []string{err.Error()},
-			})
-			return
-		}
-		// Query
-		data, err := keychains.ListKeychains(mysqlConfig, reqJson)
-		// Response
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"success": false,
-				"errors":  []string{err.Error()},
-			})
-			return
-		}
-		c.JSON(http.StatusOK, gin.H{
-			"success": true,
-			"data":    data,
+		wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
+			return keychains.ListKeychains(mysqlConfig, reqJson)
+		})
+	})
+	r.POST("/api/keychains/create", func(c *gin.Context) {
+		wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
+			return keychains.CreateKeychain(mysqlConfig, reqJson)
 		})
 	})
 
-	// listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	// ================================================================================
+	// SERVE
+	// ================================================================================
+
 	r.Run(":4200")
 }

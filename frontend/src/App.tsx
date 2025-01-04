@@ -2,7 +2,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
 
 // Constants
-import { ROUTE_KEYCHAINS_LIST, ROUTE_STAFFS_LIST } from "./constants/routes";
+import {
+  ROUTE_KEYCHAINS_CREATE,
+  ROUTE_KEYCHAINS_LIST,
+  ROUTE_STAFFS_LIST,
+} from "./constants/routes";
 
 // Pages
 import Homepage from "./pages/homepage/Homepage";

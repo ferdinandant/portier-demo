@@ -19,6 +19,7 @@ import SelectableCard from "../../../components/ui/SelectableCard/SelectableCard
 import substituteURL from "../../../utils/url/substituteURL";
 import { ROUTE_KEYCHAINS_VIEW } from "../../../constants/routes";
 import Pagination from "../../../components/ui/Pagination/Pagination";
+import CreateKeychainModal from "./CreateKeychainModal";
 
 // ================================================================================
 // MAIN
@@ -31,7 +32,6 @@ export default function KeychainsListPage() {
   const [debouncedFilterValue, setDebouncedFilterValue] = useState("");
   const debouncedSetDebouncedFilterValueRef = useRef(
     debounce(300, (value: string) => {
-      console.log("SET DEBOUNCE", value);
       setDebouncedFilterValue(value);
     })
   );
@@ -41,6 +41,10 @@ export default function KeychainsListPage() {
   const [errorTitle, setErrorTitle] = useState<string | null>(null);
   const [errors, setErrors] = useState<string[] | null>([]);
   const [data, setData] = useState<any>();
+
+  // Modal states
+  const [isCreateKeychainModalOpen, setIsCreateKeychainModalOpen] =
+    useState(true);
 
   // ------------------------------------------------------------
   // Functions
@@ -110,7 +114,12 @@ export default function KeychainsListPage() {
               onChange={handleFilterChange}
               value={filterValue}
             />
-            <Button colorPalette="green">Create</Button>
+            <Button
+              colorPalette="green"
+              onClick={() => setIsCreateKeychainModalOpen(true)}
+            >
+              Create
+            </Button>
           </HStack>
         </section>
 
@@ -172,6 +181,11 @@ export default function KeychainsListPage() {
           </Box>
         )}
       </main>
+
+      <CreateKeychainModal
+        isOpen={isCreateKeychainModalOpen}
+        onClose={() => setIsCreateKeychainModalOpen(false)}
+      />
     </>
   );
 }
