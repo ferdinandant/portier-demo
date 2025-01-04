@@ -7,14 +7,11 @@ import {
   Box,
   Button,
   Text,
-  HStack,
 } from "@chakra-ui/react";
-import { BsFillKeyFill } from "react-icons/bs";
 
 // Components
 import Header from "../../../components/site/Header/Header";
 import Alert, { AlertStatus } from "../../../components/ui/Alert/Alert";
-import SelectableCard from "../../../components/ui/SelectableCard/SelectableCard";
 import Pagination from "../../../components/ui/Pagination/Pagination";
 import UpdateKeychainModal from "./UpdateKeychainModal";
 import DeleteKeychainModal from "./DeleteKeychainModal";
@@ -29,6 +26,7 @@ import { ROUTE_KEYCHAINS_VIEW } from "../../../constants/routes";
 // Utils
 import debounce from "../../../utils/timing/debounce";
 import parseURL from "../../../utils/url/parseURL";
+import KeyCopyCard from "./KeyCopyCard";
 
 // ================================================================================
 // MAIN
@@ -230,59 +228,8 @@ export default function KeychainsViewPage() {
             {/* Results */}
             <VStack mt={4}>
               {keyCopiesData.KeyCopies.map((item: any) => {
-                const { KeyID, DateCreated, StaffID, StaffName } = item;
-                const hasAssignedStaff = StaffID.Valid;
-                console.log(item);
-                return (
-                  <Card.Root key={KeyID} width={"full"}>
-                    <Box p={4}>
-                      <HStack alignItems="start">
-                        <div>
-                          <BsFillKeyFill size={48} />
-                        </div>
-                        <VStack gap={1} alignItems="stretch" flexGrow={1}>
-                          <div>
-                            <Text
-                              textStyle="lg"
-                              style={{ width: "100%", fontWeight: 600 }}
-                            >
-                              {KeyID}
-                            </Text>
-                            <div style={{ color: "#334155" }}>
-                              Created at {DateCreated}
-                            </div>
-                          </div>
-
-                          <div
-                            style={{
-                              color: "#64748b",
-                              backgroundColor: "#f1f5f9",
-                              borderRadius: 4,
-                              paddingInline: 8,
-                              paddingBlock: 4,
-                            }}
-                          >
-                            {hasAssignedStaff ? (
-                              <>
-                                {StaffID.Valid && StaffID.String} (
-                                {StaffName.Valid && StaffName.String})
-                              </>
-                            ) : (
-                              <i
-                                style={{
-                                  fontStyle: "italic",
-                                  color: "#cbd5e1",
-                                }}
-                              >
-                                Unassigned
-                              </i>
-                            )}
-                          </div>
-                        </VStack>
-                      </HStack>
-                    </Box>
-                  </Card.Root>
-                );
+                const { KeyID } = item;
+                return <KeyCopyCard key={KeyID} keyCopyData={item} />;
               })}
             </VStack>
             {/* Pagination */}
