@@ -44,7 +44,7 @@ export default function KeychainsListPage() {
 
   // Modal states
   const [isCreateKeychainModalOpen, setIsCreateKeychainModalOpen] =
-    useState(true);
+    useState(false);
 
   // ------------------------------------------------------------
   // Functions
