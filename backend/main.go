@@ -2,12 +2,12 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
 
 	"github.com/ferdinandant/portier-demo/keychains"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-sql-driver/mysql"
 )
@@ -37,7 +37,6 @@ func main() {
 	if err != nil {
 		panic("unable to parse mysql secret file")
 	}
-	fmt.Printf("%+v\n", mysqlSecret)
 
 	// Configure connection
 	// https://github.com/go-sql-driver/mysql/pull/644
@@ -55,10 +54,19 @@ func main() {
 	// ================================================================================
 
 	r := gin.Default()
+	r.Use(cors.Default())
 
-	r.GET("/api/keychains/list", func(c *gin.Context) {
+	r.POST("/api/keychains/list", func(c *gin.Context) {
+		reqJson, err := io.ReadAll(c.Request.Body)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"errors":  []string{err.Error()},
+			})
+			return
+		}
 		// Query
-		data, err := keychains.ListKeychains(mysqlConfig)
+		data, err := keychains.ListKeychains(mysqlConfig, reqJson)
 		// Response
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
@@ -67,7 +75,7 @@ func main() {
 			})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"success": true,
 			"data":    data,
 		})

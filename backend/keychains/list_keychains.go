@@ -2,36 +2,76 @@ package keychains
 
 import (
 	"database/sql"
+	"encoding/json"
+	"math"
 
 	"github.com/go-sql-driver/mysql"
 )
 
-func ListKeychains(mysqlConfig mysql.Config) ([]Keychain, error) {
+type ListKeychainsRequest struct {
+	Filter string `json:"filter"`
+	Page   int    `json:"page"`
+}
+
+type ListKeychainsResponse struct {
+	Count     int
+	MaxPage   int
+	Keychains []Keychain
+}
+
+func ListKeychains(mysqlConfig mysql.Config, reqJson []byte) (*ListKeychainsResponse, error) {
+	// Read input
+	var reqObj ListKeychainsRequest
+	err := json.Unmarshal(reqJson, &reqObj)
+	if err != nil {
+		return nil, err
+	}
+
 	// Open connection
 	db, err := sql.Open("mysql", mysqlConfig.FormatDSN())
 	if err != nil {
 		return nil, err
 	}
 
-	// Query
-	rows, err := db.Query("SELECT keychain_id, description FROM keychains")
+	// Query for total
+	countRow := db.QueryRow(`
+		SELECT COUNT(*)
+		FROM keychains
+		WHERE description LIKE CONCAT('%', ?, '%')
+	`, reqObj.Filter)
+	var rowCount int
+	countRow.Scan(&rowCount)
+
+	// Query for data
+	offset := 10 * (reqObj.Page - 1)
+	keychainRows, err := db.Query(`
+		SELECT keychain_id, description
+		FROM keychains
+		WHERE description LIKE CONCAT('%', ?, '%')
+		ORDER BY description
+		LIMIT 10 OFFSET ?
+	`, reqObj.Filter, offset)
 	if err != nil {
 		if err != nil {
 			return nil, err
 		}
 	}
-	defer rows.Close()
-
+	defer keychainRows.Close()
 	// Parse
-	var keychains []Keychain
-	for rows.Next() {
-		var row Keychain
-		// for each row, scan the result into our tag composite object
-		err = rows.Scan(&row.KeychainID, &row.Description)
+	keychains := make([]Keychain, 0)
+	for keychainRows.Next() {
+		var keychain Keychain
+		err = keychainRows.Scan(&keychain.KeychainID, &keychain.Description)
 		if err != nil {
 			return nil, err
 		}
-		keychains = append(keychains, row)
+		keychains = append(keychains, keychain)
 	}
-	return keychains, nil
+
+	// Return
+	return &ListKeychainsResponse{
+		Count:     rowCount,
+		MaxPage:   int(math.Ceil(float64(rowCount) / 10)),
+		Keychains: keychains,
+	}, nil
 }
