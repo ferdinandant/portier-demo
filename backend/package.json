@@ -4,6 +4,6 @@
   "private": true,
   "scripts": {
     "start": "go run .",
-    "watch": "nodemon --exec go run main.go --signal SIGTERM"
+    "watch": "nodemon --exec go run . --signal SIGTERM"
   }
 }

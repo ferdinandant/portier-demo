@@ -34,23 +34,30 @@ func ListKeychains(mysqlConfig mysql.Config, reqJson []byte) (*ListKeychainsResp
 	}
 
 	// Query for total
-	countRow := db.QueryRow(`
+	countRow := db.QueryRow(
+		`
 		SELECT COUNT(*)
 		FROM keychains
 		WHERE description LIKE CONCAT('%', ?, '%')
-	`, reqObj.Filter)
+		`,
+		reqObj.Filter,
+	)
 	var rowCount int
 	countRow.Scan(&rowCount)
 
 	// Query for data
 	offset := 10 * (reqObj.Page - 1)
-	keychainRows, err := db.Query(`
+	keychainRows, err := db.Query(
+		`
 		SELECT keychain_id, description
 		FROM keychains
 		WHERE description LIKE CONCAT('%', ?, '%')
 		ORDER BY description
 		LIMIT 10 OFFSET ?
-	`, reqObj.Filter, offset)
+		`,
+		reqObj.Filter,
+		offset,
+	)
 	if err != nil {
 		if err != nil {
 			return nil, err

@@ -1,6 +1,6 @@
-import { use, useEffect, useState } from "react";
-import { Box, Button, VStack } from "@chakra-ui/react";
-import { Input } from "@chakra-ui/react";
+import { useState } from "react";
+import { Box, Button, VStack, Input } from "@chakra-ui/react";
+import { Link } from "react-router";
 
 import {
   DialogBody,
@@ -12,6 +12,9 @@ import {
 } from "../../../components/chakra/Dialog/Dialog";
 import Alert, { AlertStatus } from "../../../components/ui/Alert/Alert";
 import { Field } from "../../../components/chakra/Field/Field";
+import { API_KEYCHAINS_CREATE } from "../../../constants/api";
+import substituteURL from "../../../utils/url/substituteURL";
+import { ROUTE_KEYCHAINS_VIEW } from "../../../constants/routes";
 
 type FormState = "ready" | "loading" | "done";
 
@@ -37,8 +40,11 @@ export default function CreateKeychainModal(props: Props) {
   // ------------------------------------------------------------
 
   const resetForm = () => {
+    // Reset form
     setFormState("ready");
     setAlertStatus(undefined);
+    // Reset states
+    setDescription("");
   };
 
   const handleClose = () => {
@@ -54,22 +60,50 @@ export default function CreateKeychainModal(props: Props) {
     }
   };
 
-  const handleSubmit = () => {
-    // Validate
-    if () {
-        
+  const handleSubmit = async () => {
+    if (formState !== "ready") {
+      return;
+    }
+    try {
+      // Mark loading
+      setFormState("loading");
+      setAlertStatus("info");
+      setAlertTitle("Creating a new keychain ...");
+      setAlertContent(null);
+      // Send request
+      const res = await fetch(API_KEYCHAINS_CREATE, {
+        method: "POST",
+        body: JSON.stringify({
+          description,
+        }),
+      });
+      const decodedRes = await res.json();
+      if (decodedRes.errors) {
+        throw decodedRes.errors;
+      } else {
+        const keychainID = decodedRes.data.KeychainId;
+        const href = substituteURL(ROUTE_KEYCHAINS_VIEW, { keychainID });
+        setFormState("done");
+        setAlertStatus("success");
+        setAlertTitle("Successfully created a new keychain");
+        setAlertContent(
+          <p>
+            You can see the newly created keychain{" "}
+            <Link to={href} style={{ textDecoration: "underline" }}>
+              here
+            </Link>
+            .
+          </p>
+        );
+      }
+    } catch (err) {
+      const errContent = Array.isArray(err) ? err : (err as any).message;
+      setFormState("ready");
+      setAlertStatus("error");
+      setAlertTitle("Failed creating a new keychain");
+      setAlertContent(errContent);
     }
   };
-
-  // ------------------------------------------------------------
-  // Effects
-  // ------------------------------------------------------------
-
-  useEffect(() => {
-    setAlertStatus("success");
-    setAlertTitle("sudah dibikin");
-    setAlertContent("tobat woy");
-  }, []);
 
   // ------------------------------------------------------------
   // Render
@@ -108,9 +142,11 @@ export default function CreateKeychainModal(props: Props) {
         {/* Footer */}
         <DialogFooter>
           <Button variant="outline" onClick={handleClose}>
-            Cancel
+            Close
           </Button>
-          <Button>Save</Button>
+          <Button onClick={handleSubmit} disabled={formState !== "ready"}>
+            Save
+          </Button>
         </DialogFooter>
       </DialogContent>
     </DialogRoot>
