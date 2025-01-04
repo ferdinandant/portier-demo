@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Button, VStack, Input } from "@chakra-ui/react";
-import { Link } from "react-router";
 
 import {
   DialogBody,
@@ -12,19 +11,19 @@ import {
 } from "../../../components/chakra/Dialog/Dialog";
 import Alert, { AlertStatus } from "../../../components/ui/Alert/Alert";
 import { Field } from "../../../components/chakra/Field/Field";
-import { API_KEYCHAINS_CREATE } from "../../../constants/api";
-import substituteURL from "../../../utils/url/substituteURL";
-import { ROUTE_KEYCHAINS_VIEW } from "../../../constants/routes";
+import { API_KEYCHAINS_UPDATE } from "../../../constants/api";
 
 type FormState = "ready" | "loading" | "done";
 
 type Props = {
+  keychainData: any;
   isOpen: boolean;
   onClose?: () => any;
+  onSuccess?: () => any;
 };
 
-export default function CreateKeychainModal(props: Props) {
-  const { isOpen, onClose } = props;
+export default function UpdateKeychainModal(props: Props) {
+  const { isOpen, onClose, onSuccess, keychainData } = props;
 
   // Form state
   const [formState, setFormState] = useState<FormState>("ready");
@@ -44,19 +43,15 @@ export default function CreateKeychainModal(props: Props) {
     setFormState("ready");
     setAlertStatus(undefined);
     // Reset states
-    setDescription("");
+    if (keychainData) {
+      setDescription(keychainData.Description);
+    }
   };
 
   const handleClose = () => {
     if (onClose) {
       onClose();
       resetForm();
-    }
-  };
-
-  const handleChangeDescription = (e: any) => {
-    if (formState === "ready") {
-      setDescription(e.target.value);
     }
   };
 
@@ -68,12 +63,13 @@ export default function CreateKeychainModal(props: Props) {
       // Mark loading
       setFormState("loading");
       setAlertStatus("info");
-      setAlertTitle("Creating a new keychain ...");
+      setAlertTitle("Updating keychain ...");
       setAlertContent(null);
       // Send request
-      const res = await fetch(API_KEYCHAINS_CREATE, {
+      const res = await fetch(API_KEYCHAINS_UPDATE, {
         method: "POST",
         body: JSON.stringify({
+          keychainID: keychainData.KeychainID,
           description,
         }),
       });
@@ -81,40 +77,51 @@ export default function CreateKeychainModal(props: Props) {
       if (decodedRes.errors) {
         throw decodedRes.errors;
       } else {
-        const keychainID = decodedRes.data.KeychainId;
-        const href = substituteURL(ROUTE_KEYCHAINS_VIEW, { keychainID });
         setFormState("done");
         setAlertStatus("success");
-        setAlertTitle("Successfully created a new keychain");
-        setAlertContent(
-          <p>
-            You can see the newly created keychain{" "}
-            <Link to={href} style={{ textDecoration: "underline" }}>
-              here
-            </Link>
-            .
-          </p>
-        );
+        setAlertTitle("Successfully updated the keychain");
+        setAlertContent(null);
+        if (onSuccess) {
+          onSuccess();
+        }
       }
     } catch (err) {
       const errContent = Array.isArray(err) ? err : (err as any).message;
       setFormState("ready");
       setAlertStatus("error");
-      setAlertTitle("Failed creating a new keychain");
+      setAlertTitle("Failed updating keychain");
       setAlertContent(errContent);
     }
   };
 
+  const handleChangeDescription = (e: any) => {
+    if (formState === "ready") {
+      setDescription(e.target.value);
+    }
+  };
+
+  // ------------------------------------------------------------
+  // Effects
+  // ------------------------------------------------------------
+
+  useEffect(() => {
+    resetForm();
+  }, [isOpen]);
+
   // ------------------------------------------------------------
   // Render
   // ------------------------------------------------------------
+
+  if (!keychainData) {
+    return null;
+  }
 
   return (
     <DialogRoot size="lg" open={isOpen}>
       <DialogContent>
         {/* Header */}
         <DialogHeader>
-          <DialogTitle>Create new keychain</DialogTitle>
+          <DialogTitle>Update keychain</DialogTitle>
         </DialogHeader>
 
         {/* Body */}
@@ -128,14 +135,26 @@ export default function CreateKeychainModal(props: Props) {
               />
             </Box>
           )}
-          <VStack alignItems="stretch" gap={4}>
-            <Field label="Description" required>
-              <Input
-                placeholder=""
-                value={description}
-                onChange={handleChangeDescription}
-              />
-            </Field>
+          {/* Form */}
+          <VStack alignItems="stretch">
+            <VStack alignItems="stretch" gap={4}>
+              <Field label="Keychain ID" required>
+                <Input
+                  disabled
+                  placeholder=""
+                  value={keychainData.KeychainID}
+                />
+              </Field>
+            </VStack>
+            <VStack alignItems="stretch" gap={4}>
+              <Field label="Description" required>
+                <Input
+                  placeholder=""
+                  value={description}
+                  onChange={handleChangeDescription}
+                />
+              </Field>
+            </VStack>
           </VStack>
         </DialogBody>
 
@@ -148,7 +167,7 @@ export default function CreateKeychainModal(props: Props) {
                 Cancel
               </Button>
               <Button onClick={handleSubmit} disabled={formState !== "ready"}>
-                Save
+                Update
               </Button>
             </>
           )}

@@ -53,9 +53,11 @@ export default function Alert(props: Props) {
       )}
 
       {/* Description */}
-      <div style={title ? { paddingLeft: 28 } : {}}>
-        <ChakraAlert.Content>{content}</ChakraAlert.Content>
-      </div>
+      {content && (
+        <div style={title ? { paddingLeft: 28 } : {}}>
+          <ChakraAlert.Content>{content}</ChakraAlert.Content>
+        </div>
+      )}
     </ChakraAlert.Root>
   );
 }

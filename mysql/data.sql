@@ -1,7 +1,7 @@
 CREATE DATABASE IF NOT EXISTS portier_demo;
 USE portier_demo;
 
-INSERT INTO keychains VALUES
+INSERT INTO keychains (keychain_id, description) VALUES
     ('a7ba3f3a-528b-4325-83b8-6714a2969ebf', 'Grandmaster key'),
     ('c22be859-79ef-44db-babf-55aaf6bf4fe5', 'Office master key'),
     ('48c2c6e7-68ce-4fca-9a63-af26006fee4e', 'Warehouse master key'),

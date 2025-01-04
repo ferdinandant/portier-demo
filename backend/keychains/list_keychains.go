@@ -20,6 +20,8 @@ type ListKeychainsResponse struct {
 }
 
 func ListKeychains(mysqlConfig mysql.Config, reqJson []byte) (*ListKeychainsResponse, error) {
+	pageSize := 10
+
 	// Read input
 	var reqObj ListKeychainsRequest
 	err := json.Unmarshal(reqJson, &reqObj)
@@ -46,16 +48,17 @@ func ListKeychains(mysqlConfig mysql.Config, reqJson []byte) (*ListKeychainsResp
 	countRow.Scan(&rowCount)
 
 	// Query for data
-	offset := 10 * (reqObj.Page - 1)
+	offset := pageSize * (reqObj.Page - 1)
 	keychainRows, err := db.Query(
 		`
 		SELECT keychain_id, description
 		FROM keychains
 		WHERE description LIKE CONCAT('%', ?, '%')
 		ORDER BY description
-		LIMIT 10 OFFSET ?
+		LIMIT ? OFFSET ?
 		`,
 		reqObj.Filter,
+		pageSize,
 		offset,
 	)
 	if err != nil {
@@ -78,7 +81,7 @@ func ListKeychains(mysqlConfig mysql.Config, reqJson []byte) (*ListKeychainsResp
 	// Return
 	return &ListKeychainsResponse{
 		Count:     rowCount,
-		MaxPage:   int(math.Ceil(float64(rowCount) / 10)),
+		MaxPage:   int(math.Ceil(float64(rowCount) / float64(pageSize))),
 		Keychains: keychains,
 	}, nil
 }

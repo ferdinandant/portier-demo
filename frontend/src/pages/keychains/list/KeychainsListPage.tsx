@@ -11,15 +11,20 @@ import {
 } from "@chakra-ui/react";
 import { BsLink45Deg } from "react-icons/bs";
 
+// Components
 import Header from "../../../components/site/Header/Header";
-import debounce from "../../../utils/timing/debounce";
-import { API_KEYCHAINS_LIST } from "../../../constants/api";
 import Alert from "../../../components/ui/Alert/Alert";
 import SelectableCard from "../../../components/ui/SelectableCard/SelectableCard";
-import substituteURL from "../../../utils/url/substituteURL";
-import { ROUTE_KEYCHAINS_VIEW } from "../../../constants/routes";
 import Pagination from "../../../components/ui/Pagination/Pagination";
 import CreateKeychainModal from "./CreateKeychainModal";
+
+// Constants
+import { ROUTE_KEYCHAINS_VIEW } from "../../../constants/routes";
+import { API_KEYCHAINS_LIST } from "../../../constants/api";
+
+// Utils
+import debounce from "../../../utils/timing/debounce";
+import substituteURL from "../../../utils/url/substituteURL";
 
 // ================================================================================
 // MAIN
@@ -44,10 +49,10 @@ export default function KeychainsListPage() {
 
   // Modal states
   const [isCreateKeychainModalOpen, setIsCreateKeychainModalOpen] =
-    useState(true);
+    useState(false);
 
   // ------------------------------------------------------------
-  // Functions
+  // Handlers
   // ------------------------------------------------------------
 
   const fetchData = async () => {
@@ -110,7 +115,7 @@ export default function KeychainsListPage() {
           <HStack>
             <Input
               variant="outline"
-              placeholder="Filter by ..."
+              placeholder="Filter by description ..."
               onChange={handleFilterChange}
               value={filterValue}
             />
