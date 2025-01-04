@@ -59,7 +59,7 @@ func ListCopiesByKeychain(mysqlConfig mysql.Config, reqJson []byte) (*ListCopies
 		WHERE
 		  keycopies.keychain_id = ?
 		  AND (
-		    keycopies.keychain_id LIKE CONCAT('%', ?, '%')
+		    keycopies.key_id LIKE CONCAT('%', ?, '%')
 		    OR staff.staff_id LIKE CONCAT('%', ?, '%')
 		    OR staff.name LIKE CONCAT('%', ?, '%')
 	      )
@@ -84,7 +84,7 @@ func ListCopiesByKeychain(mysqlConfig mysql.Config, reqJson []byte) (*ListCopies
 		WHERE
 		  keycopies.keychain_id = ?
 		  AND (
-		    keycopies.keychain_id LIKE CONCAT('%', ?, '%')
+		    keycopies.key_id LIKE CONCAT('%', ?, '%')
 		    OR staff.staff_id LIKE CONCAT('%', ?, '%')
 		    OR staff.name LIKE CONCAT('%', ?, '%')
 	      )

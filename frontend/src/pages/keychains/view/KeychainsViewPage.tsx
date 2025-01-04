@@ -7,7 +7,9 @@ import {
   Box,
   Button,
   Text,
+  HStack,
 } from "@chakra-ui/react";
+import { BsFillKeyFill } from "react-icons/bs";
 
 // Components
 import Header from "../../../components/site/Header/Header";
@@ -208,7 +210,7 @@ export default function KeychainsViewPage() {
         </Card.Root>
 
         {/* Filter section */}
-        <Box mt={8}>
+        <Box as="section" mt={8}>
           <Text mb={2} textStyle="2xl" style={{ fontWeight: 700 }}>
             Key copies
           </Text>
@@ -219,6 +221,78 @@ export default function KeychainsViewPage() {
             value={filterValue}
           />
         </Box>
+        {keyCopiesData && (
+          <Box as="section" mt={8}>
+            <b>
+              Displaying {keyCopiesData.KeyCopies.length} of{" "}
+              {keyCopiesData.Count} key copies.
+            </b>
+            {/* Results */}
+            <VStack mt={4}>
+              {keyCopiesData.KeyCopies.map((item: any) => {
+                const { KeyID, DateCreated, StaffID, StaffName } = item;
+                const hasAssignedStaff = StaffID.Valid;
+                console.log(item);
+                return (
+                  <Card.Root key={KeyID} width={"full"}>
+                    <Box p={4}>
+                      <HStack alignItems="start">
+                        <div>
+                          <BsFillKeyFill size={48} />
+                        </div>
+                        <VStack gap={1} alignItems="stretch" flexGrow={1}>
+                          <div>
+                            <Text
+                              textStyle="lg"
+                              style={{ width: "100%", fontWeight: 600 }}
+                            >
+                              {KeyID}
+                            </Text>
+                            <div style={{ color: "#334155" }}>
+                              Created at {DateCreated}
+                            </div>
+                          </div>
+
+                          <div
+                            style={{
+                              color: "#64748b",
+                              backgroundColor: "#f1f5f9",
+                              borderRadius: 4,
+                              paddingInline: 8,
+                              paddingBlock: 4,
+                            }}
+                          >
+                            {hasAssignedStaff ? (
+                              <>
+                                {StaffID.Valid && StaffID.String} (
+                                {StaffName.Valid && StaffName.String})
+                              </>
+                            ) : (
+                              <i
+                                style={{
+                                  fontStyle: "italic",
+                                  color: "#cbd5e1",
+                                }}
+                              >
+                                Unassigned
+                              </i>
+                            )}
+                          </div>
+                        </VStack>
+                      </HStack>
+                    </Box>
+                  </Card.Root>
+                );
+              })}
+            </VStack>
+            {/* Pagination */}
+            <Pagination
+              currentPage={currentPage}
+              maxPage={keyCopiesData.MaxPage}
+              onChangePage={handleChangePage}
+            />
+          </Box>
+        )}
 
         {/* Modals */}
         <UpdateKeychainModal
