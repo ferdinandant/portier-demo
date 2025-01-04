@@ -26,6 +26,11 @@ func ViewKeychain(mysqlConfig mysql.Config, reqJson []byte) (*ViewKeychainRespon
 		return nil, err
 	}
 
+	// Validate
+	if reqObj.KeychainID == "" {
+		return nil, errors.New("parameter KeychainID is required")
+	}
+
 	// Open connection
 	db, err := sql.Open("mysql", mysqlConfig.FormatDSN())
 	if err != nil {

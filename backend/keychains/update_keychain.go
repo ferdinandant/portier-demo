@@ -26,10 +26,10 @@ func UpdateKeychain(mysqlConfig mysql.Config, reqJson []byte) (*UpdateKeychainRe
 
 	// Validate
 	if reqObj.KeychainID == "" {
-		return nil, errors.New("keychain ID is required")
+		return nil, errors.New("argument KeychainID is required")
 	}
 	if reqObj.Description == "" {
-		return nil, errors.New("description is required")
+		return nil, errors.New("argument Description is required")
 	}
 
 	// Open connection

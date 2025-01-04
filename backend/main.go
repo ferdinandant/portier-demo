@@ -82,6 +82,13 @@ func main() {
 		})
 	})
 
+	// Key copy handlers
+	r.POST("/api/keycopies/list-by-keychain", func(c *gin.Context) {
+		wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
+			return keychains.DeleteKeychain(mysqlConfig, reqJson)
+		})
+	})
+
 	// ================================================================================
 	// SERVE
 	// ================================================================================

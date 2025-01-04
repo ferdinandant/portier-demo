@@ -25,7 +25,7 @@ func DeleteKeychain(mysqlConfig mysql.Config, reqJson []byte) (*DeleteKeychainRe
 
 	// Validate
 	if reqObj.KeychainID == "" {
-		return nil, errors.New("keychain ID is required")
+		return nil, errors.New("argument KeychainID is required")
 	}
 
 	// Open connection
