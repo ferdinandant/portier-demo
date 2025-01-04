@@ -18,7 +18,10 @@ import UpdateKeychainModal from "./UpdateKeychainModal";
 import DeleteKeychainModal from "./DeleteKeychainModal";
 
 // Constants
-import { API_KEYCHAINS_VIEW } from "../../../constants/api";
+import {
+  API_KEYCHAINS_VIEW,
+  API_KEYCOPIES_LIST_BY_KEYCHAIN,
+} from "../../../constants/api";
 import { ROUTE_KEYCHAINS_VIEW } from "../../../constants/routes";
 
 // Utils
@@ -49,7 +52,7 @@ export default function KeychainsViewPage() {
   const [isKeychainDataLoading, setIsKeychainDataLoading] = useState(true);
   const [isKeyCopiesDataLoading, setIsKeyCopiesDataLoading] = useState(true);
   const [keychainData, setKeychainData] = useState<any>();
-  const [keyCopiedData, setKeyCopiesData] = useState<any>();
+  const [keyCopiesData, setKeyCopiesData] = useState<any>();
 
   // Modal state
   const [isUpdateKeychainModalOpen, setIsUpdateKeychainModalOpen] =
@@ -62,7 +65,6 @@ export default function KeychainsViewPage() {
   // ------------------------------------------------------------
 
   const fetchKeychainData = async () => {
-    const errTitle = "Error fetching keychains";
     try {
       const { keychainID } = parseURL(ROUTE_KEYCHAINS_VIEW);
       const res = await fetch(API_KEYCHAINS_VIEW, {
@@ -87,30 +89,30 @@ export default function KeychainsViewPage() {
   };
 
   const fetchKeyCopiesData = async () => {
-    // const errTitle = "Error fetching keychains";
-    // try {
-    //   setIsLoading(true);
-    //   const res = await fetch(API_KEYCHAINS_LIST, {
-    //     method: "POST",
-    //     body: JSON.stringify({
-    //       filter: debouncedFilterValue,
-    //       page: currentPage,
-    //     }),
-    //   });
-    //   const decodedRes = await res.json();
-    //   setIsLoading(false);
-    //   setData(decodedRes.data);
-    //   if (decodedRes.errors) {
-    //     setErrorTitle(errTitle);
-    //     setErrors(decodedRes.errors);
-    //   }
-    // } catch (err) {
-    //   const errStr = (err as any).message;
-    //   setIsLoading(false);
-    //   setData(null);
-    //   setErrorTitle(errTitle);
-    //   setErrors([errStr]);
-    // }
+    try {
+      const { keychainID } = parseURL(ROUTE_KEYCHAINS_VIEW);
+      const res = await fetch(API_KEYCOPIES_LIST_BY_KEYCHAIN, {
+        method: "POST",
+        body: JSON.stringify({
+          keychainID,
+          filter: debouncedFilterValue,
+          page: currentPage,
+        }),
+      });
+      const decodedRes = await res.json();
+      if (decodedRes.errors) {
+        throw decodedRes.errors;
+      }
+      setIsKeyCopiesDataLoading(false);
+      setKeyCopiesData(decodedRes.data);
+      console.log(decodedRes);
+    } catch (err) {
+      const errContent = Array.isArray(err) ? err : (err as any).message;
+      setIsKeyCopiesDataLoading(false);
+      setAlertStatus("error");
+      setAlertTitle("Failed fetching key copies data");
+      setAlertContent(errContent);
+    }
   };
 
   const handleFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -127,9 +129,13 @@ export default function KeychainsViewPage() {
   // ------------------------------------------------------------
 
   useEffect(() => {
+    // document.title = `View Keychain | Portier Demo`;
     fetchKeychainData();
-    fetchKeyCopiesData();
   }, []);
+
+  useEffect(() => {
+    fetchKeyCopiesData();
+  }, [debouncedFilterValue, currentPage]);
 
   // ------------------------------------------------------------
   // Renders

@@ -99,6 +99,10 @@ export default function KeychainsListPage() {
     fetchData();
   }, [debouncedFilterValue, currentPage]);
 
+  useEffect(() => {
+    document.title = `Keychains List | Portier Demo`;
+  }, []);
+
   // ------------------------------------------------------------
   // Renders
   // ------------------------------------------------------------

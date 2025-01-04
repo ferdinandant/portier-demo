@@ -24,8 +24,8 @@ type ListCopiesByKeychainResponse struct {
 type KeyCopyData struct {
 	KeyID       string
 	DateCreated string
-	StaffID     string
-	StaffName   string
+	StaffID     sql.NullString
+	StaffName   sql.NullString
 }
 
 func ListCopiesByKeychain(mysqlConfig mysql.Config, reqJson []byte) (*ListCopiesByKeychainResponse, error) {
@@ -54,13 +54,17 @@ func ListCopiesByKeychain(mysqlConfig mysql.Config, reqJson []byte) (*ListCopies
 		`
 		SELECT COUNT(*) FROM keycopies
 		LEFT JOIN staff ON
-		  staff.staff_id=keycopies.staff_id
+		  staff.staff_id = keycopies.staff_id
 		  AND keycopies.keychain_id = ?
 		WHERE
-		  keycopies.keychain_id LIKE CONCAT('%', ?, '%')
-		  OR staff.staff_id LIKE CONCAT('%', ?, '%')
-		  OR staff.name LIKE CONCAT('%', ?, '%')
+		  keycopies.keychain_id = ?
+		  AND (
+		    keycopies.keychain_id LIKE CONCAT('%', ?, '%')
+		    OR staff.staff_id LIKE CONCAT('%', ?, '%')
+		    OR staff.name LIKE CONCAT('%', ?, '%')
+	      )
 		`,
+		reqObj.KeychainID,
 		reqObj.KeychainID,
 		reqObj.Filter,
 		reqObj.Filter,
@@ -75,15 +79,19 @@ func ListCopiesByKeychain(mysqlConfig mysql.Config, reqJson []byte) (*ListCopies
 		`
 		SELECT keycopies.key_id, keycopies.date_created, staff.staff_id, staff.name FROM keycopies
 		LEFT JOIN staff ON
-		  staff.staff_id=keycopies.staff_id
+		  staff.staff_id = keycopies.staff_id
 		  AND keycopies.keychain_id = ?
 		WHERE
-		  keycopies.keychain_id LIKE CONCAT('%', ?, '%')
-		  OR staff.staff_id LIKE CONCAT('%', ?, '%')
-		  OR staff.name LIKE CONCAT('%', ?, '%')
+		  keycopies.keychain_id = ?
+		  AND (
+		    keycopies.keychain_id LIKE CONCAT('%', ?, '%')
+		    OR staff.staff_id LIKE CONCAT('%', ?, '%')
+		    OR staff.name LIKE CONCAT('%', ?, '%')
+	      )
 		ORDER BY keycopies.date_created DESC
 		LIMIT ? OFFSET ?
 		`,
+		reqObj.KeychainID,
 		reqObj.KeychainID,
 		reqObj.Filter,
 		reqObj.Filter,
@@ -92,9 +100,7 @@ func ListCopiesByKeychain(mysqlConfig mysql.Config, reqJson []byte) (*ListCopies
 		offset,
 	)
 	if err != nil {
-		if err != nil {
-			return nil, err
-		}
+		return nil, err
 	}
 	defer keychainRows.Close()
 	// Parse

@@ -28,7 +28,7 @@ func ViewKeychain(mysqlConfig mysql.Config, reqJson []byte) (*ViewKeychainRespon
 
 	// Validate
 	if reqObj.KeychainID == "" {
-		return nil, errors.New("parameter KeychainID is required")
+		return nil, errors.New("argument KeychainID is required")
 	}
 
 	// Open connection
