@@ -18,6 +18,8 @@ code {
 
 main {
   margin-top: 92px;
+  margin-bottom: 64px;
   max-width: 720px;
   margin-inline: auto;
+  padding-inline: 16px;
 }
