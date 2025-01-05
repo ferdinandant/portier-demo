@@ -18,6 +18,7 @@ type ListCopiesByKeychainRequest struct {
 type ListCopiesByKeychainResponse struct {
 	Count     int
 	MaxPage   int
+	PageSize  int
 	KeyCopies []KeyCopyData
 }
 
@@ -53,15 +54,15 @@ func ListCopiesByKeychain(mysqlConfig mysql.Config, reqJson []byte) (*ListCopies
 	countRow := db.QueryRow(
 		`
 		SELECT COUNT(*) FROM keycopies
-		LEFT JOIN staff ON
-		  staff.staff_id = keycopies.staff_id
+		LEFT JOIN staffs ON
+		  staffs.staff_id = keycopies.staff_id
 		  AND keycopies.keychain_id = ?
 		WHERE
 		  keycopies.keychain_id = ?
 		  AND (
 		    keycopies.key_id LIKE CONCAT('%', ?, '%')
-		    OR staff.staff_id LIKE CONCAT('%', ?, '%')
-		    OR staff.name LIKE CONCAT('%', ?, '%')
+		    OR staffs.staff_id LIKE CONCAT('%', ?, '%')
+		    OR staffs.name LIKE CONCAT('%', ?, '%')
 	      )
 		`,
 		reqObj.KeychainID,
@@ -77,16 +78,16 @@ func ListCopiesByKeychain(mysqlConfig mysql.Config, reqJson []byte) (*ListCopies
 	offset := pageSize * (reqObj.Page - 1)
 	keychainRows, err := db.Query(
 		`
-		SELECT keycopies.key_id, keycopies.date_created, staff.staff_id, staff.name FROM keycopies
-		LEFT JOIN staff ON
-		  staff.staff_id = keycopies.staff_id
+		SELECT keycopies.key_id, keycopies.date_created, staffs.staff_id, staffs.name FROM keycopies
+		LEFT JOIN staffs ON
+		  staffs.staff_id = keycopies.staff_id
 		  AND keycopies.keychain_id = ?
 		WHERE
 		  keycopies.keychain_id = ?
 		  AND (
 		    keycopies.key_id LIKE CONCAT('%', ?, '%')
-		    OR staff.staff_id LIKE CONCAT('%', ?, '%')
-		    OR staff.name LIKE CONCAT('%', ?, '%')
+		    OR staffs.staff_id LIKE CONCAT('%', ?, '%')
+		    OR staffs.name LIKE CONCAT('%', ?, '%')
 	      )
 		ORDER BY keycopies.date_created DESC
 		LIMIT ? OFFSET ?
@@ -123,6 +124,7 @@ func ListCopiesByKeychain(mysqlConfig mysql.Config, reqJson []byte) (*ListCopies
 	return &ListCopiesByKeychainResponse{
 		Count:     rowCount,
 		MaxPage:   int(math.Ceil(float64(rowCount) / float64(pageSize))),
+		PageSize:  pageSize,
 		KeyCopies: keyCopies,
 	}, nil
 }

@@ -201,6 +201,18 @@ export default function KeychainsViewPage() {
   // Renders
   // ------------------------------------------------------------
 
+  let displayedRecordStr = "";
+  if (keyCopiesData) {
+    const totalRecords = keyCopiesData.Count;
+    const pageSize = keyCopiesData.PageSize;
+    const startRecordNo = Math.min(
+      (currentPage - 1) * pageSize + 1,
+      totalRecords
+    );
+    const endRecordNo = Math.min(currentPage * pageSize, totalRecords);
+    displayedRecordStr = `Displaying records ${startRecordNo}–${endRecordNo} of ${totalRecords}.`;
+  }
+
   return (
     <>
       <header>
@@ -286,10 +298,7 @@ export default function KeychainsViewPage() {
         </Box>
         {keyCopiesData && (
           <Box as="section" mt={8}>
-            <b>
-              Displaying {keyCopiesData.KeyCopies.length} of{" "}
-              {keyCopiesData.Count} key copies.
-            </b>
+            <b>{displayedRecordStr}</b>
             {/* Results */}
             <VStack mt={4}>
               {keyCopiesData.KeyCopies.map((item: any) => {

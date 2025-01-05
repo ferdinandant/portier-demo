@@ -7,6 +7,7 @@ import (
 
 	"github.com/ferdinandant/portier-demo/keychains"
 	"github.com/ferdinandant/portier-demo/keycopies"
+	"github.com/ferdinandant/portier-demo/staffs"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-sql-driver/mysql"
@@ -104,6 +105,33 @@ func main() {
 			return keycopies.UpdateCopy(mysqlConfig, reqJson)
 		})
 	})
+
+	// Staffs
+	r.POST("/api/staffs/list", func(c *gin.Context) {
+		wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
+			return staffs.ListStaffs(mysqlConfig, reqJson)
+		})
+	})
+	// r.POST("/api/staffs/create", func(c *gin.Context) {
+	// 	wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
+	// 		return staffs.CreateStaff(mysqlConfig, reqJson)
+	// 	})
+	// })
+	r.POST("/api/staffs/view", func(c *gin.Context) {
+		wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
+			return staffs.ViewStaff(mysqlConfig, reqJson)
+		})
+	})
+	// r.POST("/api/staffs/update", func(c *gin.Context) {
+	// 	wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
+	// 		return staffs.UpdateStaff(mysqlConfig, reqJson)
+	// 	})
+	// })
+	// r.POST("/api/staffs/delete", func(c *gin.Context) {
+	// 	wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
+	// 		return staffs.DeleteStaff(mysqlConfig, reqJson)
+	// 	})
+	// })
 
 	// ================================================================================
 	// SERVE
