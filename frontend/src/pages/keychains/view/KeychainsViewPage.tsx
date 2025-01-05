@@ -30,6 +30,7 @@ import { ROUTE_KEYCHAINS_VIEW } from "../../../constants/routes";
 import debounce from "../../../utils/timing/debounce";
 import parseURL from "../../../utils/url/parseURL";
 import KeyCopyCard from "./KeyCopyCard";
+import UpdateCopyModal from "./UpdateCopyModal";
 
 // ================================================================================
 // MAIN
@@ -62,6 +63,8 @@ export default function KeychainsViewPage() {
     useState(false);
   const [isDeleteKeychainModalOpen, setIsDeleteKeychainModalOpen] =
     useState(false);
+  const [isUpdateCopyModalOpen, setIsUpdateCopyModalOpen] = useState(false);
+  const [updateCopyModalKeyData, setUpdateCopyModalKeyData] = useState(null);
 
   // ------------------------------------------------------------
   // Handlers
@@ -295,6 +298,13 @@ export default function KeychainsViewPage() {
                   <KeyCopyCard
                     key={KeyID}
                     keyCopyData={item}
+                    onRequestUpdate={() => {
+                      const keyCopyData = keyCopiesData.KeyCopies.find(
+                        (i: any) => i.KeyID === KeyID
+                      );
+                      setIsUpdateCopyModalOpen(true);
+                      setUpdateCopyModalKeyData(keyCopyData);
+                    }}
                     onRequestDelete={() => deleteCopy(KeyID)}
                   />
                 );
@@ -320,6 +330,11 @@ export default function KeychainsViewPage() {
           keychainData={keychainData}
           isOpen={isDeleteKeychainModalOpen}
           onClose={() => setIsDeleteKeychainModalOpen(false)}
+        />
+        <UpdateCopyModal
+          isOpen={isUpdateCopyModalOpen}
+          onClose={() => setIsUpdateCopyModalOpen(false)}
+          keyCopyData={updateCopyModalKeyData}
         />
       </main>
     </>
