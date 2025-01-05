@@ -15,7 +15,7 @@ import Header from "../../../components/site/Header/Header";
 import Alert, { AlertStatus } from "../../../components/ui/Alert/Alert";
 import Pagination from "../../../components/ui/Pagination/Pagination";
 // import UpdateStaffModal from "./UpdateStaffModal";
-// import DeleteStaffModal from "./DeleteStaffModal";
+import DeleteStaffModal from "./DeleteStaffModal";
 
 // Constants
 import {
@@ -296,12 +296,12 @@ export default function KeychainsViewPage() {
           isOpen={isUpdateStaffModalOpen}
           onClose={() => setIsUpdateStaffModalOpen(false)}
           onSuccess={() => fetchKeychainData()}
-        />
+        /> */}
         <DeleteStaffModal
-          keychainData={keychainData}
+          staffData={staffData}
           isOpen={isDeleteStaffModalOpen}
           onClose={() => setIsDeleteStaffModalOpen(false)}
-        /> */}
+        />
       </main>
     </>
   );
