@@ -51,7 +51,7 @@ func DeleteKeychain(mysqlConfig mysql.Config, reqJson []byte) (*DeleteKeychainRe
 		return nil, err
 	}
 	if rows == 0 {
-		return nil, errors.New("no row was affected")
+		return nil, errors.New("the keychain was not found")
 	}
 
 	return &DeleteKeychainResponse{}, nil

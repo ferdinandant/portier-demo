@@ -334,6 +334,7 @@ export default function KeychainsViewPage() {
         <UpdateCopyModal
           isOpen={isUpdateCopyModalOpen}
           onClose={() => setIsUpdateCopyModalOpen(false)}
+          onSuccess={() => fetchKeyCopiesData()}
           keyCopyData={updateCopyModalKeyData}
         />
       </main>

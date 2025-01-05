@@ -99,6 +99,11 @@ func main() {
 			return keycopies.DeleteCopy(mysqlConfig, reqJson)
 		})
 	})
+	r.POST("/api/keycopies/update", func(c *gin.Context) {
+		wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
+			return keycopies.UpdateCopy(mysqlConfig, reqJson)
+		})
+	})
 
 	// ================================================================================
 	// SERVE

@@ -5,19 +5,21 @@ import (
 	"encoding/json"
 	"errors"
 
+	"github.com/ferdinandant/portier-demo/utils"
 	"github.com/go-sql-driver/mysql"
 )
 
-type DeleteCopyRequest struct {
-	KeyID string `json:"keyID"`
+type UpdateCopyRequest struct {
+	KeyID   string `json:"keyID"`
+	StaffID string `json:"staffID"`
 }
 
-type DeleteCopyResponse struct {
+type UpdateCopyResponse struct {
 }
 
-func DeleteCopy(mysqlConfig mysql.Config, reqJson []byte) (*DeleteCopyResponse, error) {
+func UpdateCopy(mysqlConfig mysql.Config, reqJson []byte) (*UpdateCopyResponse, error) {
 	// Read input
-	var reqObj DeleteCopyRequest
+	var reqObj UpdateCopyRequest
 	err := json.Unmarshal(reqJson, &reqObj)
 	if err != nil {
 		return nil, err
@@ -35,24 +37,18 @@ func DeleteCopy(mysqlConfig mysql.Config, reqJson []byte) (*DeleteCopyResponse, 
 	}
 
 	// Update table
-	result, err := db.Exec(
+	_, err = db.Exec(
 		`
-		DELETE FROM keycopies
+		UPDATE keycopies
+		SET staff_id = ?
 		WHERE key_id = ?
 		`,
+		utils.NewNullString(reqObj.StaffID),
 		reqObj.KeyID,
 	)
 	if err != nil {
 		return nil, err
 	}
-	// Check update
-	rows, err := result.RowsAffected()
-	if err != nil {
-		return nil, err
-	}
-	if rows == 0 {
-		return nil, errors.New("the key was not found")
-	}
 
-	return &DeleteCopyResponse{}, nil
+	return &UpdateCopyResponse{}, nil
 }

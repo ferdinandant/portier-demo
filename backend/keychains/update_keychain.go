@@ -39,7 +39,7 @@ func UpdateKeychain(mysqlConfig mysql.Config, reqJson []byte) (*UpdateKeychainRe
 	}
 
 	// Update table
-	result, err := db.Exec(
+	_, err = db.Exec(
 		`
 		UPDATE keychains
 		SET description = ?
@@ -50,14 +50,6 @@ func UpdateKeychain(mysqlConfig mysql.Config, reqJson []byte) (*UpdateKeychainRe
 	)
 	if err != nil {
 		return nil, err
-	}
-	// Check effect
-	rows, err := result.RowsAffected()
-	if err != nil {
-		return nil, err
-	}
-	if rows == 0 {
-		return nil, errors.New("no row was affected")
 	}
 
 	return &UpdateKeychainResponse{}, nil
