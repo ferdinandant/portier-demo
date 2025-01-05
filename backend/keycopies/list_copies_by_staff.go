@@ -9,39 +9,39 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
-type ListCopiesByKeychainRequest struct {
-	KeychainID string `json:"keychainID"`
-	Filter     string `json:"filter"`
-	Page       int    `json:"page"`
+type ListCopiesByStaffRequest struct {
+	StaffID string `json:"staffID"`
+	Filter  string `json:"filter"`
+	Page    int    `json:"page"`
 }
 
-type ListCopiesByKeychainResponse struct {
+type ListCopiesByStaffResponse struct {
 	Count     int
 	MaxPage   int
 	PageSize  int
-	KeyCopies []KeyCopyInKeychain
+	KeyCopies []KeyCopyByStaff
 }
 
-type KeyCopyInKeychain struct {
-	KeyID       string
-	DateCreated string
-	StaffID     sql.NullString
-	StaffName   sql.NullString
+type KeyCopyByStaff struct {
+	KeyID               string
+	DateCreated         string
+	KeychainID          string
+	KeychainDescription string
 }
 
-func ListCopiesByKeychain(mysqlConfig mysql.Config, reqJson []byte) (*ListCopiesByKeychainResponse, error) {
+func ListCopiesByStaff(mysqlConfig mysql.Config, reqJson []byte) (*ListCopiesByStaffResponse, error) {
 	pageSize := 5
 
 	// Read input
-	var reqObj ListCopiesByKeychainRequest
+	var reqObj ListCopiesByStaffRequest
 	err := json.Unmarshal(reqJson, &reqObj)
 	if err != nil {
 		return nil, err
 	}
 
 	// Validate
-	if reqObj.KeychainID == "" {
-		return nil, errors.New("argument KeychainID is required")
+	if reqObj.StaffID == "" {
+		return nil, errors.New("argument StaffID is required")
 	}
 
 	// Open connection
@@ -54,19 +54,18 @@ func ListCopiesByKeychain(mysqlConfig mysql.Config, reqJson []byte) (*ListCopies
 	countRow := db.QueryRow(
 		`
 		SELECT COUNT(*) FROM keycopies
-		LEFT JOIN staffs ON
-		  staffs.staff_id = keycopies.staff_id
-		  AND keycopies.keychain_id = ?
+		INNER JOIN keychains ON
+		  keycopies.keychain_id = keychains.keychain_id
 		WHERE
-		  keycopies.keychain_id = ?
+		  keycopies.staff_id = ?
 		  AND (
 		    keycopies.key_id LIKE CONCAT('%', ?, '%')
-		    OR staffs.staff_id LIKE CONCAT('%', ?, '%')
-		    OR staffs.name LIKE CONCAT('%', ?, '%')
+		    OR keychains.keychain_id LIKE CONCAT('%', ?, '%')
+		    OR keychains.description LIKE CONCAT('%', ?, '%')
 	      )
+		ORDER BY keycopies.date_created DESC
 		`,
-		reqObj.KeychainID,
-		reqObj.KeychainID,
+		reqObj.StaffID,
 		reqObj.Filter,
 		reqObj.Filter,
 		reqObj.Filter,
@@ -78,22 +77,21 @@ func ListCopiesByKeychain(mysqlConfig mysql.Config, reqJson []byte) (*ListCopies
 	offset := pageSize * (reqObj.Page - 1)
 	keychainRows, err := db.Query(
 		`
-		SELECT keycopies.key_id, keycopies.date_created, staffs.staff_id, staffs.name FROM keycopies
-		LEFT JOIN staffs ON
-		  staffs.staff_id = keycopies.staff_id
-		  AND keycopies.keychain_id = ?
+		SELECT keycopies.key_id, keycopies.date_created, keychains.keychain_id, keychains.description
+		FROM keycopies
+		INNER JOIN keychains ON
+		  keycopies.keychain_id = keychains.keychain_id
 		WHERE
-		  keycopies.keychain_id = ?
+		  keycopies.staff_id = ?
 		  AND (
 		    keycopies.key_id LIKE CONCAT('%', ?, '%')
-		    OR staffs.staff_id LIKE CONCAT('%', ?, '%')
-		    OR staffs.name LIKE CONCAT('%', ?, '%')
+		    OR keychains.keychain_id LIKE CONCAT('%', ?, '%')
+		    OR keychains.description LIKE CONCAT('%', ?, '%')
 	      )
 		ORDER BY keycopies.date_created DESC
 		LIMIT ? OFFSET ?
 		`,
-		reqObj.KeychainID,
-		reqObj.KeychainID,
+		reqObj.StaffID,
 		reqObj.Filter,
 		reqObj.Filter,
 		reqObj.Filter,
@@ -105,14 +103,14 @@ func ListCopiesByKeychain(mysqlConfig mysql.Config, reqJson []byte) (*ListCopies
 	}
 	defer keychainRows.Close()
 	// Parse
-	keyCopies := make([]KeyCopyInKeychain, 0)
+	keyCopies := make([]KeyCopyByStaff, 0)
 	for keychainRows.Next() {
-		var keyCopy KeyCopyInKeychain
+		var keyCopy KeyCopyByStaff
 		err = keychainRows.Scan(
 			&keyCopy.KeyID,
 			&keyCopy.DateCreated,
-			&keyCopy.StaffID,
-			&keyCopy.StaffName,
+			&keyCopy.KeychainID,
+			&keyCopy.KeychainDescription,
 		)
 		if err != nil {
 			return nil, err
@@ -121,7 +119,7 @@ func ListCopiesByKeychain(mysqlConfig mysql.Config, reqJson []byte) (*ListCopies
 	}
 
 	// Return
-	return &ListCopiesByKeychainResponse{
+	return &ListCopiesByStaffResponse{
 		Count:     rowCount,
 		MaxPage:   int(math.Ceil(float64(rowCount) / float64(pageSize))),
 		PageSize:  pageSize,

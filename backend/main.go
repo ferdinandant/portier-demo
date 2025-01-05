@@ -90,6 +90,11 @@ func main() {
 			return keycopies.ListCopiesByKeychain(mysqlConfig, reqJson)
 		})
 	})
+	r.POST("/api/keycopies/list-by-staff", func(c *gin.Context) {
+		wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
+			return keycopies.ListCopiesByStaff(mysqlConfig, reqJson)
+		})
+	})
 	r.POST("/api/keycopies/create", func(c *gin.Context) {
 		wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
 			return keycopies.CreateCopy(mysqlConfig, reqJson)
@@ -122,16 +127,16 @@ func main() {
 			return staffs.ViewStaff(mysqlConfig, reqJson)
 		})
 	})
-	// r.POST("/api/staffs/update", func(c *gin.Context) {
-	// 	wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
-	// 		return staffs.UpdateStaff(mysqlConfig, reqJson)
-	// 	})
-	// })
-	// r.POST("/api/staffs/delete", func(c *gin.Context) {
-	// 	wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
-	// 		return staffs.DeleteStaff(mysqlConfig, reqJson)
-	// 	})
-	// })
+	r.POST("/api/staffs/update", func(c *gin.Context) {
+		wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
+			return staffs.UpdateStaff(mysqlConfig, reqJson)
+		})
+	})
+	r.POST("/api/staffs/delete", func(c *gin.Context) {
+		wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
+			return staffs.DeleteStaff(mysqlConfig, reqJson)
+		})
+	})
 
 	// ================================================================================
 	// SERVE
