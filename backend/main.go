@@ -112,11 +112,11 @@ func main() {
 			return staffs.ListStaffs(mysqlConfig, reqJson)
 		})
 	})
-	// r.POST("/api/staffs/create", func(c *gin.Context) {
-	// 	wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
-	// 		return staffs.CreateStaff(mysqlConfig, reqJson)
-	// 	})
-	// })
+	r.POST("/api/staffs/create", func(c *gin.Context) {
+		wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
+			return staffs.CreateStaff(mysqlConfig, reqJson)
+		})
+	})
 	r.POST("/api/staffs/view", func(c *gin.Context) {
 		wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
 			return staffs.ViewStaff(mysqlConfig, reqJson)

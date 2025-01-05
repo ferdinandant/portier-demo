@@ -21,10 +21,11 @@ type FormState = "ready" | "loading" | "done";
 type Props = {
   isOpen: boolean;
   onClose?: () => any;
+  onSuccess?: () => any;
 };
 
 export default function CreateKeychainModal(props: Props) {
-  const { isOpen, onClose } = props;
+  const { isOpen, onClose, onSuccess } = props;
 
   // Form state
   const [formState, setFormState] = useState<FormState>("ready");
@@ -95,6 +96,9 @@ export default function CreateKeychainModal(props: Props) {
             .
           </p>
         );
+        if (onSuccess) {
+          onSuccess();
+        }
       }
     } catch (err) {
       const errContent = Array.isArray(err) ? err : (err as any).message;
@@ -148,7 +152,7 @@ export default function CreateKeychainModal(props: Props) {
                 Cancel
               </Button>
               <Button onClick={handleSubmit} disabled={formState !== "ready"}>
-                Save
+                Create
               </Button>
             </>
           )}

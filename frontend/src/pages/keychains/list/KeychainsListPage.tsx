@@ -202,6 +202,7 @@ export default function KeychainsListPage() {
       <CreateKeychainModal
         isOpen={isCreateKeychainModalOpen}
         onClose={() => setIsCreateKeychainModalOpen(false)}
+        onSuccess={() => fetchData()}
       />
     </>
   );

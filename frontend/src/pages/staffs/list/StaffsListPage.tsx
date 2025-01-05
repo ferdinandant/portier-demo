@@ -201,6 +201,7 @@ export default function StaffsViewPage() {
       <CreateStaffModal
         isOpen={isCreateStaffModalOpen}
         onClose={() => setIsCreateStaffModalOpen(false)}
+        onSuccess={() => fetchData()}
       />
     </>
   );
