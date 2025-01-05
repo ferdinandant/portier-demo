@@ -7,6 +7,7 @@ import {
   Box,
   Button,
   Text,
+  HStack,
 } from "@chakra-ui/react";
 
 // Components
@@ -19,6 +20,8 @@ import DeleteKeychainModal from "./DeleteKeychainModal";
 // Constants
 import {
   API_KEYCHAINS_VIEW,
+  API_KEYCOPIES_CREATE,
+  API_KEYCOPIES_DELETE,
   API_KEYCOPIES_LIST_BY_KEYCHAIN,
 } from "../../../constants/api";
 import { ROUTE_KEYCHAINS_VIEW } from "../../../constants/routes";
@@ -27,6 +30,7 @@ import { ROUTE_KEYCHAINS_VIEW } from "../../../constants/routes";
 import debounce from "../../../utils/timing/debounce";
 import parseURL from "../../../utils/url/parseURL";
 import KeyCopyCard from "./KeyCopyCard";
+import UpdateCopyModal from "./UpdateCopyModal";
 
 // ================================================================================
 // MAIN
@@ -59,6 +63,8 @@ export default function KeychainsViewPage() {
     useState(false);
   const [isDeleteKeychainModalOpen, setIsDeleteKeychainModalOpen] =
     useState(false);
+  const [isUpdateCopyModalOpen, setIsUpdateCopyModalOpen] = useState(false);
+  const [updateCopyModalKeyData, setUpdateCopyModalKeyData] = useState(null);
 
   // ------------------------------------------------------------
   // Handlers
@@ -105,12 +111,66 @@ export default function KeychainsViewPage() {
       }
       setIsKeyCopiesDataLoading(false);
       setKeyCopiesData(decodedRes.data);
-      console.log(decodedRes);
     } catch (err) {
       const errContent = Array.isArray(err) ? err : (err as any).message;
       setIsKeyCopiesDataLoading(false);
       setAlertStatus("error");
       setAlertTitle("Failed fetching key copies data");
+      setAlertContent(errContent);
+    }
+  };
+
+  const createNewCopy = async () => {
+    setAlertStatus("info");
+    setAlertTitle("Creating a new key copy ...");
+    setAlertContent(undefined);
+    try {
+      const { keychainID } = parseURL(ROUTE_KEYCHAINS_VIEW);
+      const res = await fetch(API_KEYCOPIES_CREATE, {
+        method: "POST",
+        body: JSON.stringify({
+          keychainID,
+        }),
+      });
+      const decodedRes = await res.json();
+      if (decodedRes.errors) {
+        throw decodedRes.errors;
+      }
+      setAlertStatus("success");
+      setAlertTitle("Succesfully created a new copy");
+      setAlertContent(`The new key ID is "${decodedRes.data.KeyID}"`);
+      fetchKeyCopiesData();
+    } catch (err) {
+      const errContent = Array.isArray(err) ? err : (err as any).message;
+      setAlertStatus("error");
+      setAlertTitle("Failed creating a new copy");
+      setAlertContent(errContent);
+    }
+  };
+
+  const deleteCopy = async (keyID: string) => {
+    setAlertStatus("info");
+    setAlertTitle(`Deleting key "${keyID}" ...`);
+    setAlertContent(undefined);
+    try {
+      const res = await fetch(API_KEYCOPIES_DELETE, {
+        method: "POST",
+        body: JSON.stringify({
+          keyID,
+        }),
+      });
+      const decodedRes = await res.json();
+      if (decodedRes.errors) {
+        throw decodedRes.errors;
+      }
+      setAlertStatus("success");
+      setAlertTitle("Succesfully deleted key copy");
+      setAlertContent(`The deleted key ID was "${keyID}"`);
+      fetchKeyCopiesData();
+    } catch (err) {
+      const errContent = Array.isArray(err) ? err : (err as any).message;
+      setAlertStatus("error");
+      setAlertTitle("Failed deleting key copy");
       setAlertContent(errContent);
     }
   };
@@ -129,7 +189,7 @@ export default function KeychainsViewPage() {
   // ------------------------------------------------------------
 
   useEffect(() => {
-    // document.title = `View Keychain | Portier Demo`;
+    document.title = `View Keychain | Portier Demo`;
     fetchKeychainData();
   }, []);
 
@@ -212,12 +272,17 @@ export default function KeychainsViewPage() {
           <Text mb={2} textStyle="2xl" style={{ fontWeight: 700 }}>
             Key copies
           </Text>
-          <Input
-            variant="outline"
-            placeholder="Filter by key ID or bearer ID ..."
-            onChange={handleFilterChange}
-            value={filterValue}
-          />
+          <HStack>
+            <Input
+              variant="outline"
+              placeholder="Filter by key ID or bearer name/ID ..."
+              onChange={handleFilterChange}
+              value={filterValue}
+            />
+            <Button colorPalette="green" onClick={createNewCopy}>
+              Create new copy
+            </Button>
+          </HStack>
         </Box>
         {keyCopiesData && (
           <Box as="section" mt={8}>
@@ -229,7 +294,20 @@ export default function KeychainsViewPage() {
             <VStack mt={4}>
               {keyCopiesData.KeyCopies.map((item: any) => {
                 const { KeyID } = item;
-                return <KeyCopyCard key={KeyID} keyCopyData={item} />;
+                return (
+                  <KeyCopyCard
+                    key={KeyID}
+                    keyCopyData={item}
+                    onRequestUpdate={() => {
+                      const keyCopyData = keyCopiesData.KeyCopies.find(
+                        (i: any) => i.KeyID === KeyID
+                      );
+                      setIsUpdateCopyModalOpen(true);
+                      setUpdateCopyModalKeyData(keyCopyData);
+                    }}
+                    onRequestDelete={() => deleteCopy(KeyID)}
+                  />
+                );
               })}
             </VStack>
             {/* Pagination */}
@@ -252,6 +330,12 @@ export default function KeychainsViewPage() {
           keychainData={keychainData}
           isOpen={isDeleteKeychainModalOpen}
           onClose={() => setIsDeleteKeychainModalOpen(false)}
+        />
+        <UpdateCopyModal
+          isOpen={isUpdateCopyModalOpen}
+          onClose={() => setIsUpdateCopyModalOpen(false)}
+          onSuccess={() => fetchKeyCopiesData()}
+          keyCopyData={updateCopyModalKeyData}
         />
       </main>
     </>

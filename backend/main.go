@@ -89,6 +89,21 @@ func main() {
 			return keycopies.ListCopiesByKeychain(mysqlConfig, reqJson)
 		})
 	})
+	r.POST("/api/keycopies/create", func(c *gin.Context) {
+		wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
+			return keycopies.CreateCopy(mysqlConfig, reqJson)
+		})
+	})
+	r.POST("/api/keycopies/delete", func(c *gin.Context) {
+		wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
+			return keycopies.DeleteCopy(mysqlConfig, reqJson)
+		})
+	})
+	r.POST("/api/keycopies/update", func(c *gin.Context) {
+		wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
+			return keycopies.UpdateCopy(mysqlConfig, reqJson)
+		})
+	})
 
 	// ================================================================================
 	// SERVE

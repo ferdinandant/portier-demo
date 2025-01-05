@@ -19,3 +19,9 @@ export const API_KEYCHAINS_DELETE = `${API_HOST}/api/keychains/delete`;
 // ================================================================================
 
 export const API_KEYCOPIES_LIST_BY_KEYCHAIN = `${API_HOST}/api/keycopies/list-by-keychain`;
+
+export const API_KEYCOPIES_CREATE = `${API_HOST}/api/keycopies/create`;
+
+export const API_KEYCOPIES_DELETE = `${API_HOST}/api/keycopies/delete`;
+
+export const API_KEYCOPIES_UPDATE = `${API_HOST}/api/keycopies/update`;

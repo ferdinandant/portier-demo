@@ -29,7 +29,7 @@ type KeyCopyData struct {
 }
 
 func ListCopiesByKeychain(mysqlConfig mysql.Config, reqJson []byte) (*ListCopiesByKeychainResponse, error) {
-	pageSize := 10
+	pageSize := 5
 
 	// Read input
 	var reqObj ListCopiesByKeychainRequest

@@ -35,7 +35,7 @@ func DeleteKeychain(mysqlConfig mysql.Config, reqJson []byte) (*DeleteKeychainRe
 	}
 
 	// Update table
-	_, err = db.Exec(
+	result, err := db.Exec(
 		`
 		DELETE FROM keychains
 		WHERE keychain_id = ?
@@ -44,6 +44,14 @@ func DeleteKeychain(mysqlConfig mysql.Config, reqJson []byte) (*DeleteKeychainRe
 	)
 	if err != nil {
 		return nil, err
+	}
+	// Check effect
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return nil, err
+	}
+	if rows == 0 {
+		return nil, errors.New("the keychain was not found")
 	}
 
 	return &DeleteKeychainResponse{}, nil
