@@ -1,4 +1,4 @@
-package keychains
+package keycopies
 
 import (
 	"database/sql"
@@ -8,24 +8,24 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
-type DeleteKeychainRequest struct {
-	KeychainID string `json:"keychainID"`
+type DeleteCopyRequest struct {
+	KeyID string `json:"keyID"`
 }
 
-type DeleteKeychainResponse struct {
+type DeleteCopyResponse struct {
 }
 
-func DeleteKeychain(mysqlConfig mysql.Config, reqJson []byte) (*DeleteKeychainResponse, error) {
+func DeleteCopy(mysqlConfig mysql.Config, reqJson []byte) (*DeleteCopyResponse, error) {
 	// Read input
-	var reqObj DeleteKeychainRequest
+	var reqObj DeleteCopyRequest
 	err := json.Unmarshal(reqJson, &reqObj)
 	if err != nil {
 		return nil, err
 	}
 
 	// Validate
-	if reqObj.KeychainID == "" {
-		return nil, errors.New("argument KeychainID is required")
+	if reqObj.KeyID == "" {
+		return nil, errors.New("argument KeyID is required")
 	}
 
 	// Open connection
@@ -37,15 +37,15 @@ func DeleteKeychain(mysqlConfig mysql.Config, reqJson []byte) (*DeleteKeychainRe
 	// Update table
 	result, err := db.Exec(
 		`
-		DELETE FROM keychains
-		WHERE keychain_id = ?
+		DELETE FROM keycopies
+		WHERE key_id = ?
 		`,
-		reqObj.KeychainID,
+		reqObj.KeyID,
 	)
 	if err != nil {
 		return nil, err
 	}
-	// Check effect
+	// Check update
 	rows, err := result.RowsAffected()
 	if err != nil {
 		return nil, err
@@ -54,5 +54,5 @@ func DeleteKeychain(mysqlConfig mysql.Config, reqJson []byte) (*DeleteKeychainRe
 		return nil, errors.New("no row was affected")
 	}
 
-	return &DeleteKeychainResponse{}, nil
+	return &DeleteCopyResponse{}, nil
 }

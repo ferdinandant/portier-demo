@@ -94,6 +94,11 @@ func main() {
 			return keycopies.CreateCopy(mysqlConfig, reqJson)
 		})
 	})
+	r.POST("/api/keycopies/delete", func(c *gin.Context) {
+		wrapHandler(c, func(c *gin.Context, reqJson []byte) (interface{}, error) {
+			return keycopies.DeleteCopy(mysqlConfig, reqJson)
+		})
+	})
 
 	// ================================================================================
 	// SERVE

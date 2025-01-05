@@ -21,6 +21,7 @@ import DeleteKeychainModal from "./DeleteKeychainModal";
 import {
   API_KEYCHAINS_VIEW,
   API_KEYCOPIES_CREATE,
+  API_KEYCOPIES_DELETE,
   API_KEYCOPIES_LIST_BY_KEYCHAIN,
 } from "../../../constants/api";
 import { ROUTE_KEYCHAINS_VIEW } from "../../../constants/routes";
@@ -144,6 +145,33 @@ export default function KeychainsViewPage() {
     }
   };
 
+  const deleteCopy = async (keyID: string) => {
+    setAlertStatus("info");
+    setAlertTitle(`Deleting key "${keyID}" ...`);
+    setAlertContent(undefined);
+    try {
+      const res = await fetch(API_KEYCOPIES_DELETE, {
+        method: "POST",
+        body: JSON.stringify({
+          keyID,
+        }),
+      });
+      const decodedRes = await res.json();
+      if (decodedRes.errors) {
+        throw decodedRes.errors;
+      }
+      setAlertStatus("success");
+      setAlertTitle("Succesfully deleted key copy");
+      setAlertContent(`The deleted key ID was "${keyID}"`);
+      fetchKeyCopiesData();
+    } catch (err) {
+      const errContent = Array.isArray(err) ? err : (err as any).message;
+      setAlertStatus("error");
+      setAlertTitle("Failed deleting key copy");
+      setAlertContent(errContent);
+    }
+  };
+
   const handleFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFilterValue(e.target.value);
     debouncedSetDebouncedFilterValueRef.current(e.target.value);
@@ -158,7 +186,7 @@ export default function KeychainsViewPage() {
   // ------------------------------------------------------------
 
   useEffect(() => {
-    // document.title = `View Keychain | Portier Demo`;
+    document.title = `View Keychain | Portier Demo`;
     fetchKeychainData();
   }, []);
 
@@ -263,7 +291,13 @@ export default function KeychainsViewPage() {
             <VStack mt={4}>
               {keyCopiesData.KeyCopies.map((item: any) => {
                 const { KeyID } = item;
-                return <KeyCopyCard key={KeyID} keyCopyData={item} />;
+                return (
+                  <KeyCopyCard
+                    key={KeyID}
+                    keyCopyData={item}
+                    onRequestDelete={() => deleteCopy(KeyID)}
+                  />
+                );
               })}
             </VStack>
             {/* Pagination */}
