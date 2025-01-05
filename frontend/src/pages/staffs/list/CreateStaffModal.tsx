@@ -12,9 +12,9 @@ import {
 } from "../../../components/chakra/Dialog/Dialog";
 import Alert, { AlertStatus } from "../../../components/ui/Alert/Alert";
 import { Field } from "../../../components/chakra/Field/Field";
-import { API_KEYCHAINS_CREATE } from "../../../constants/api";
+import { API_STAFFS_CREATE } from "../../../constants/api";
 import substituteURL from "../../../utils/url/substituteURL";
-import { ROUTE_KEYCHAINS_VIEW } from "../../../constants/routes";
+import { ROUTE_STAFFS_VIEW } from "../../../constants/routes";
 
 type FormState = "ready" | "loading" | "done";
 
@@ -24,12 +24,12 @@ type Props = {
   onSuccess?: () => any;
 };
 
-export default function CreateKeychainModal(props: Props) {
+export default function CreateStaffModal(props: Props) {
   const { isOpen, onClose, onSuccess } = props;
 
   // Form state
   const [formState, setFormState] = useState<FormState>("ready");
-  const [description, setDescription] = useState("");
+  const [name, setName] = useState("");
 
   // Alert state
   const [alertStatus, setAlertStatus] = useState<AlertStatus>();
@@ -45,7 +45,7 @@ export default function CreateKeychainModal(props: Props) {
     setFormState("ready");
     setAlertStatus(undefined);
     // Reset states
-    setDescription("");
+    setName("");
   };
 
   const handleClose = () => {
@@ -55,9 +55,9 @@ export default function CreateKeychainModal(props: Props) {
     }
   };
 
-  const handleChangeDescription = (e: any) => {
+  const handleChangeName = (e: any) => {
     if (formState === "ready") {
-      setDescription(e.target.value);
+      setName(e.target.value);
     }
   };
 
@@ -69,27 +69,27 @@ export default function CreateKeychainModal(props: Props) {
       // Mark loading
       setFormState("loading");
       setAlertStatus("info");
-      setAlertTitle("Creating a new keychain ...");
+      setAlertTitle("Creating a new staff ...");
       setAlertContent(null);
       // Send request
-      const res = await fetch(API_KEYCHAINS_CREATE, {
+      const res = await fetch(API_STAFFS_CREATE, {
         method: "POST",
         body: JSON.stringify({
-          description,
+          name,
         }),
       });
       const decodedRes = await res.json();
       if (decodedRes.errors) {
         throw decodedRes.errors;
       } else {
-        const keychainID = decodedRes.data.KeychainId;
-        const href = substituteURL(ROUTE_KEYCHAINS_VIEW, { keychainID });
+        const staffID = decodedRes.data.StaffID;
+        const href = substituteURL(ROUTE_STAFFS_VIEW, { staffID });
         setFormState("done");
         setAlertStatus("success");
-        setAlertTitle("Successfully created a new keychain");
+        setAlertTitle("Successfully created a new staff");
         setAlertContent(
           <p>
-            You can see the newly created keychain{" "}
+            You can see the newly created staff{" "}
             <Link to={href} style={{ textDecoration: "underline" }}>
               here
             </Link>
@@ -104,7 +104,7 @@ export default function CreateKeychainModal(props: Props) {
       const errContent = Array.isArray(err) ? err : (err as any).message;
       setFormState("ready");
       setAlertStatus("error");
-      setAlertTitle("Failed creating a new keychain");
+      setAlertTitle("Failed creating a new staff");
       setAlertContent(errContent);
     }
   };
@@ -133,12 +133,8 @@ export default function CreateKeychainModal(props: Props) {
             </Box>
           )}
           <VStack alignItems="stretch" gap={4}>
-            <Field label="Description" required>
-              <Input
-                placeholder=""
-                value={description}
-                onChange={handleChangeDescription}
-              />
+            <Field label="Name" required>
+              <Input placeholder="" value={name} onChange={handleChangeName} />
             </Field>
           </VStack>
         </DialogBody>

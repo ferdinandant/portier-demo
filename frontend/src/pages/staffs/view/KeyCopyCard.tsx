@@ -4,21 +4,15 @@ import { Card, VStack, Box, Button, Text, HStack } from "@chakra-ui/react";
 
 type Props = {
   keyCopyData: any;
-  onRequestUpdate?: () => any;
-  onRequestDelete?: () => any;
+  onRequestDisassociate?: () => any;
 };
 
 export default function KeyCopyCard(props: Props) {
-  const { keyCopyData, onRequestUpdate, onRequestDelete } = props;
-  const { KeyID, DateCreated, StaffID, StaffName } = keyCopyData;
-  const hasAssignedStaff = StaffID.Valid;
+  const { keyCopyData, onRequestDisassociate } = props;
+  const { KeyID, KeychainID, KeychainDescription } = keyCopyData;
 
-  const handleClickUpdate = () => {
-    onRequestUpdate && onRequestUpdate();
-  };
-
-  const handleClickDelete = () => {
-    onRequestDelete && onRequestDelete();
+  const handleClickDisassociate = () => {
+    onRequestDisassociate && onRequestDisassociate();
   };
 
   return (
@@ -36,9 +30,9 @@ export default function KeyCopyCard(props: Props) {
                 <Text textStyle="lg" style={{ width: "100%", fontWeight: 600 }}>
                   {KeyID}
                 </Text>
-                <div style={{ color: "#334155" }}>Created at {DateCreated}</div>
               </div>
               {/* Details */}
+              <div>From keychain:</div>
               <div
                 style={{
                   color: "#64748b",
@@ -48,34 +42,17 @@ export default function KeyCopyCard(props: Props) {
                   paddingBlock: 4,
                 }}
               >
-                {hasAssignedStaff ? (
-                  <>
-                    {StaffID.Valid && StaffID.String} (
-                    {StaffName.Valid && StaffName.String})
-                  </>
-                ) : (
-                  <i
-                    style={{
-                      fontStyle: "italic",
-                      color: "#cbd5e1",
-                    }}
-                  >
-                    Unassigned
-                  </i>
-                )}
+                <p>{KeychainID}</p>
+                <p>{KeychainDescription}</p>
               </div>
               {/* Buttons */}
               <HStack pt={2} justifyContent="flex-end">
-                <Button size="xs" variant="subtle" onClick={handleClickUpdate}>
-                  Assign/unassign bearer
-                </Button>
                 <Button
                   size="xs"
                   variant="subtle"
-                  colorPalette="red"
-                  onClick={handleClickDelete}
+                  onClick={handleClickDisassociate}
                 >
-                  Delete
+                  Disassociate
                 </Button>
               </HStack>
             </VStack>

@@ -56,7 +56,6 @@ export default function KeychainsListPage() {
   // ------------------------------------------------------------
 
   const fetchData = async () => {
-    const errTitle = "Error fetching keychains";
     try {
       setIsLoading(true);
       const res = await fetch(API_KEYCHAINS_LIST, {
@@ -67,18 +66,17 @@ export default function KeychainsListPage() {
         }),
       });
       const decodedRes = await res.json();
+      if (decodedRes.errors) {
+        throw decodedRes.errors;
+      }
       setIsLoading(false);
       setData(decodedRes.data);
-      if (decodedRes.errors) {
-        setErrorTitle(errTitle);
-        setErrors(decodedRes.errors);
-      }
     } catch (err) {
-      const errStr = (err as any).message;
+      const errContent = Array.isArray(err) ? err : (err as any).message;
       setIsLoading(false);
       setData(null);
-      setErrorTitle(errTitle);
-      setErrors([errStr]);
+      setErrorTitle("Error fetching keychains");
+      setErrors(errContent);
     }
   };
 
@@ -106,6 +104,18 @@ export default function KeychainsListPage() {
   // ------------------------------------------------------------
   // Renders
   // ------------------------------------------------------------
+
+  let displayedRecordStr = "";
+  if (data) {
+    const totalRecords = data.Count;
+    const pageSize = data.PageSize;
+    const startRecordNo = Math.min(
+      (currentPage - 1) * pageSize + 1,
+      totalRecords
+    );
+    const endRecordNo = Math.min(currentPage * pageSize, totalRecords);
+    displayedRecordStr = `Displaying records ${startRecordNo}–${endRecordNo} of ${totalRecords} record(s).`;
+  }
 
   return (
     <>
@@ -149,9 +159,7 @@ export default function KeychainsListPage() {
         )}
         {!isLoading && data && (
           <Box as="section" mt={8}>
-            <b>
-              Displaying {data.Keychains.length} of {data.Count} record(s).
-            </b>
+            <b>{displayedRecordStr}</b>
             {/* Results */}
             <VStack mt={4}>
               {data.Keychains.map((item: any) => {
@@ -194,6 +202,7 @@ export default function KeychainsListPage() {
       <CreateKeychainModal
         isOpen={isCreateKeychainModalOpen}
         onClose={() => setIsCreateKeychainModalOpen(false)}
+        onSuccess={() => fetchData()}
       />
     </>
   );

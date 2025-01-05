@@ -26,7 +26,7 @@ INSERT INTO keychains (keychain_id, description) VALUES
   ('3f142e5f-05b3-430d-8c3f-5527ffe62820', 'Zonk keychain 19'),
   ('02aa7567-0a30-4006-a802-872afefaba8a', 'Zonk keychain 20');
 
-INSERT INTO staff (staff_id, name) VALUES
+INSERT INTO staffs (staff_id, name) VALUES
   ('7829a4b4-3347-47bf-95d1-119df15a8624', 'Pak Pukis'),
   ('6ff99e6b-57d8-486c-ba7a-b8e0b67750df', 'Pak Pancong');
 

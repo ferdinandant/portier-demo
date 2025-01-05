@@ -14,23 +14,21 @@ import {
 import Header from "../../../components/site/Header/Header";
 import Alert, { AlertStatus } from "../../../components/ui/Alert/Alert";
 import Pagination from "../../../components/ui/Pagination/Pagination";
-import UpdateKeychainModal from "./UpdateKeychainModal";
-import DeleteKeychainModal from "./DeleteKeychainModal";
+// import UpdateStaffModal from "./UpdateStaffModal";
+// import DeleteStaffModal from "./DeleteStaffModal";
 
 // Constants
 import {
-  API_KEYCHAINS_VIEW,
-  API_KEYCOPIES_CREATE,
-  API_KEYCOPIES_DELETE,
-  API_KEYCOPIES_LIST_BY_KEYCHAIN,
+  API_KEYCOPIES_LIST_BY_STAFF,
+  API_KEYCOPIES_UPDATE,
+  API_STAFFS_VIEW,
 } from "../../../constants/api";
-import { ROUTE_KEYCHAINS_VIEW } from "../../../constants/routes";
+import { ROUTE_STAFFS_VIEW } from "../../../constants/routes";
 
 // Utils
 import debounce from "../../../utils/timing/debounce";
 import parseURL from "../../../utils/url/parseURL";
 import KeyCopyCard from "./KeyCopyCard";
-import UpdateCopyModal from "./UpdateCopyModal";
 
 // ================================================================================
 // MAIN
@@ -53,54 +51,50 @@ export default function KeychainsViewPage() {
   const [alertContent, setAlertContent] = useState<any>();
 
   // Data state
-  const [isKeychainDataLoading, setIsKeychainDataLoading] = useState(true);
+  const [isStaffDataLoading, setIsStaffDataLoading] = useState(true);
   const [isKeyCopiesDataLoading, setIsKeyCopiesDataLoading] = useState(true);
-  const [keychainData, setKeychainData] = useState<any>();
+  const [staffData, setStaffData] = useState<any>();
   const [keyCopiesData, setKeyCopiesData] = useState<any>();
 
   // Modal state
-  const [isUpdateKeychainModalOpen, setIsUpdateKeychainModalOpen] =
-    useState(false);
-  const [isDeleteKeychainModalOpen, setIsDeleteKeychainModalOpen] =
-    useState(false);
-  const [isUpdateCopyModalOpen, setIsUpdateCopyModalOpen] = useState(false);
-  const [updateCopyModalKeyData, setUpdateCopyModalKeyData] = useState(null);
+  const [isUpdateStaffModalOpen, setIsUpdateStaffModalOpen] = useState(false);
+  const [isDeleteStaffModalOpen, setIsDeleteStaffModalOpen] = useState(false);
 
   // ------------------------------------------------------------
   // Handlers
   // ------------------------------------------------------------
 
-  const fetchKeychainData = async () => {
+  const fetchStaffData = async () => {
     try {
-      const { keychainID } = parseURL(ROUTE_KEYCHAINS_VIEW);
-      const res = await fetch(API_KEYCHAINS_VIEW, {
+      const { staffID } = parseURL(ROUTE_STAFFS_VIEW);
+      const res = await fetch(API_STAFFS_VIEW, {
         method: "POST",
         body: JSON.stringify({
-          keychainID,
+          staffID,
         }),
       });
       const decodedRes = await res.json();
       if (decodedRes.errors) {
         throw decodedRes.errors;
       }
-      setIsKeychainDataLoading(false);
-      setKeychainData(decodedRes.data);
+      setIsStaffDataLoading(false);
+      setStaffData(decodedRes.data);
     } catch (err) {
       const errContent = Array.isArray(err) ? err : (err as any).message;
-      setIsKeychainDataLoading(false);
+      setIsStaffDataLoading(false);
       setAlertStatus("error");
-      setAlertTitle("Failed fetching keychain data");
+      setAlertTitle("Failed fetching staff data");
       setAlertContent(errContent);
     }
   };
 
   const fetchKeyCopiesData = async () => {
     try {
-      const { keychainID } = parseURL(ROUTE_KEYCHAINS_VIEW);
-      const res = await fetch(API_KEYCOPIES_LIST_BY_KEYCHAIN, {
+      const { staffID } = parseURL(ROUTE_STAFFS_VIEW);
+      const res = await fetch(API_KEYCOPIES_LIST_BY_STAFF, {
         method: "POST",
         body: JSON.stringify({
-          keychainID,
+          staffID,
           filter: debouncedFilterValue,
           page: currentPage,
         }),
@@ -120,57 +114,33 @@ export default function KeychainsViewPage() {
     }
   };
 
-  const createNewCopy = async () => {
-    setAlertStatus("info");
-    setAlertTitle("Creating a new key copy ...");
-    setAlertContent(undefined);
+  const disassociateKeyCopy = async (keyID: string) => {
     try {
-      const { keychainID } = parseURL(ROUTE_KEYCHAINS_VIEW);
-      const res = await fetch(API_KEYCOPIES_CREATE, {
+      // Mark loading
+      setAlertStatus("info");
+      setAlertTitle(`Diassociating key "${keyID}" ...`);
+      setAlertContent(null);
+      // Send request
+      const res = await fetch(API_KEYCOPIES_UPDATE, {
         method: "POST",
         body: JSON.stringify({
-          keychainID,
+          keyID: keyID,
+          staffID: null,
         }),
       });
       const decodedRes = await res.json();
       if (decodedRes.errors) {
         throw decodedRes.errors;
+      } else {
+        setAlertStatus("success");
+        setAlertTitle(`Removed key "${keyID}" from staff...`);
+        setAlertContent(null);
+        fetchKeyCopiesData();
       }
-      setAlertStatus("success");
-      setAlertTitle("Succesfully created a new copy");
-      setAlertContent(`The new key ID is "${decodedRes.data.KeyID}"`);
-      fetchKeyCopiesData();
     } catch (err) {
       const errContent = Array.isArray(err) ? err : (err as any).message;
       setAlertStatus("error");
-      setAlertTitle("Failed creating a new copy");
-      setAlertContent(errContent);
-    }
-  };
-
-  const deleteCopy = async (keyID: string) => {
-    setAlertStatus("info");
-    setAlertTitle(`Deleting key "${keyID}" ...`);
-    setAlertContent(undefined);
-    try {
-      const res = await fetch(API_KEYCOPIES_DELETE, {
-        method: "POST",
-        body: JSON.stringify({
-          keyID,
-        }),
-      });
-      const decodedRes = await res.json();
-      if (decodedRes.errors) {
-        throw decodedRes.errors;
-      }
-      setAlertStatus("success");
-      setAlertTitle("Succesfully deleted key copy");
-      setAlertContent(`The deleted key ID was "${keyID}"`);
-      fetchKeyCopiesData();
-    } catch (err) {
-      const errContent = Array.isArray(err) ? err : (err as any).message;
-      setAlertStatus("error");
-      setAlertTitle("Failed deleting key copy");
+      setAlertTitle(`Failed diassociating key "${keyID}"`);
       setAlertContent(errContent);
     }
   };
@@ -190,7 +160,7 @@ export default function KeychainsViewPage() {
 
   useEffect(() => {
     document.title = `View Keychain | Portier Demo`;
-    fetchKeychainData();
+    fetchStaffData();
   }, []);
 
   useEffect(() => {
@@ -230,48 +200,48 @@ export default function KeychainsViewPage() {
           </Box>
         )}
 
-        {/* Keychain data section */}
+        {/* Staff data section */}
         <Text mb={2} textStyle="2xl" style={{ fontWeight: 700 }}>
-          Keychain data
+          Staff data
         </Text>
         <Card.Root mb={4} variant="subtle">
           <Card.Body gap="2">
-            {isKeychainDataLoading && (
+            {isStaffDataLoading && (
               <VStack>
                 <Spinner size="xl" />
               </VStack>
             )}
-            {!isKeychainDataLoading && !keychainData && (
+            {!isStaffDataLoading && !staffData && (
               <VStack>That keychain is not found.</VStack>
             )}
-            {!isKeychainDataLoading && keychainData && (
+            {!isStaffDataLoading && staffData && (
               <VStack alignItems="stretch">
                 <VStack alignItems="stretch" gap={0}>
-                  <div style={{ fontWeight: 700 }}>Keychain ID</div>
-                  <div>{keychainData.KeychainID}</div>
+                  <div style={{ fontWeight: 700 }}>Staff ID</div>
+                  <div>{staffData.StaffID}</div>
                 </VStack>
                 <VStack alignItems="stretch" gap={0}>
-                  <div style={{ fontWeight: 700 }}>Description</div>
-                  <div>{keychainData.Description}</div>
+                  <div style={{ fontWeight: 700 }}>Name</div>
+                  <div>{staffData.Name}</div>
                 </VStack>
                 <VStack alignItems="stretch" gap={0}>
                   <div style={{ fontWeight: 700 }}>Date created</div>
-                  <div>{keychainData.DateCreated}</div>
+                  <div>{staffData.DateCreated}</div>
                 </VStack>
               </VStack>
             )}
           </Card.Body>
-          {!isKeychainDataLoading && keychainData && (
+          {!isStaffDataLoading && staffData && (
             <Card.Footer justifyContent="flex-end">
               <Button
                 variant="outline"
-                onClick={() => setIsUpdateKeychainModalOpen(true)}
+                onClick={() => setIsUpdateStaffModalOpen(true)}
               >
                 Edit
               </Button>
               <Button
                 colorPalette="red"
-                onClick={() => setIsDeleteKeychainModalOpen(true)}
+                onClick={() => setIsDeleteStaffModalOpen(true)}
               >
                 Delete
               </Button>
@@ -282,18 +252,15 @@ export default function KeychainsViewPage() {
         {/* Filter section */}
         <Box as="section" mt={8}>
           <Text mb={2} textStyle="2xl" style={{ fontWeight: 700 }}>
-            Key copies
+            Associated key copies
           </Text>
           <HStack>
             <Input
               variant="outline"
-              placeholder="Filter by key ID or bearer name/ID ..."
+              placeholder="Filter by key ID or keychain description/ID ..."
               onChange={handleFilterChange}
               value={filterValue}
             />
-            <Button colorPalette="green" onClick={createNewCopy}>
-              Create new copy
-            </Button>
           </HStack>
         </Box>
         {keyCopiesData && (
@@ -307,14 +274,9 @@ export default function KeychainsViewPage() {
                   <KeyCopyCard
                     key={KeyID}
                     keyCopyData={item}
-                    onRequestUpdate={() => {
-                      const keyCopyData = keyCopiesData.KeyCopies.find(
-                        (i: any) => i.KeyID === KeyID
-                      );
-                      setIsUpdateCopyModalOpen(true);
-                      setUpdateCopyModalKeyData(keyCopyData);
+                    onRequestDisassociate={() => {
+                      disassociateKeyCopy(KeyID);
                     }}
-                    onRequestDelete={() => deleteCopy(KeyID)}
                   />
                 );
               })}
@@ -329,23 +291,17 @@ export default function KeychainsViewPage() {
         )}
 
         {/* Modals */}
-        <UpdateKeychainModal
+        {/* <UpdateStaffModal
           keychainData={keychainData}
-          isOpen={isUpdateKeychainModalOpen}
-          onClose={() => setIsUpdateKeychainModalOpen(false)}
+          isOpen={isUpdateStaffModalOpen}
+          onClose={() => setIsUpdateStaffModalOpen(false)}
           onSuccess={() => fetchKeychainData()}
         />
-        <DeleteKeychainModal
+        <DeleteStaffModal
           keychainData={keychainData}
-          isOpen={isDeleteKeychainModalOpen}
-          onClose={() => setIsDeleteKeychainModalOpen(false)}
-        />
-        <UpdateCopyModal
-          isOpen={isUpdateCopyModalOpen}
-          onClose={() => setIsUpdateCopyModalOpen(false)}
-          onSuccess={() => fetchKeyCopiesData()}
-          keyCopyData={updateCopyModalKeyData}
-        />
+          isOpen={isDeleteStaffModalOpen}
+          onClose={() => setIsDeleteStaffModalOpen(false)}
+        /> */}
       </main>
     </>
   );

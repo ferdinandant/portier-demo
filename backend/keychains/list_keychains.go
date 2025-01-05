@@ -16,6 +16,7 @@ type ListKeychainsRequest struct {
 type ListKeychainsResponse struct {
 	Count     int
 	MaxPage   int
+	PageSize  int
 	Keychains []Keychain
 }
 
@@ -62,9 +63,7 @@ func ListKeychains(mysqlConfig mysql.Config, reqJson []byte) (*ListKeychainsResp
 		offset,
 	)
 	if err != nil {
-		if err != nil {
-			return nil, err
-		}
+		return nil, err
 	}
 	defer keychainRows.Close()
 	// Parse
@@ -82,6 +81,7 @@ func ListKeychains(mysqlConfig mysql.Config, reqJson []byte) (*ListKeychainsResp
 	return &ListKeychainsResponse{
 		Count:     rowCount,
 		MaxPage:   int(math.Ceil(float64(rowCount) / float64(pageSize))),
+		PageSize:  pageSize,
 		Keychains: keychains,
 	}, nil
 }
