@@ -4,21 +4,19 @@ import { Card, VStack, Box, Button, Text, HStack } from "@chakra-ui/react";
 
 type Props = {
   keyCopyData: any;
-  onClickUpdate?: (keyID: string) => any;
-  onClickDelete?: (keyID: string) => any;
 };
 
 export default function KeyCopyCard(props: Props) {
-  const { keyCopyData, onClickUpdate, onClickDelete } = props;
+  const { keyCopyData } = props;
   const { KeyID, DateCreated, StaffID, StaffName } = keyCopyData;
   const hasAssignedStaff = StaffID.Valid;
 
   const handleClickUpdate = () => {
-    onClickUpdate && onClickUpdate(KeyID);
+    // onClickUpdate && onClickUpdate(KeyID);
   };
 
   const handleClickDelete = () => {
-    onClickDelete && onClickDelete(KeyID);
+    // onClickDelete && onClickDelete(KeyID);
   };
 
   return (

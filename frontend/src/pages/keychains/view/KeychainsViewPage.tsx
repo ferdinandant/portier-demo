@@ -7,6 +7,7 @@ import {
   Box,
   Button,
   Text,
+  HStack,
 } from "@chakra-ui/react";
 
 // Components
@@ -19,6 +20,7 @@ import DeleteKeychainModal from "./DeleteKeychainModal";
 // Constants
 import {
   API_KEYCHAINS_VIEW,
+  API_KEYCOPIES_CREATE,
   API_KEYCOPIES_LIST_BY_KEYCHAIN,
 } from "../../../constants/api";
 import { ROUTE_KEYCHAINS_VIEW } from "../../../constants/routes";
@@ -105,12 +107,39 @@ export default function KeychainsViewPage() {
       }
       setIsKeyCopiesDataLoading(false);
       setKeyCopiesData(decodedRes.data);
-      console.log(decodedRes);
     } catch (err) {
       const errContent = Array.isArray(err) ? err : (err as any).message;
       setIsKeyCopiesDataLoading(false);
       setAlertStatus("error");
       setAlertTitle("Failed fetching key copies data");
+      setAlertContent(errContent);
+    }
+  };
+
+  const createNewCopy = async () => {
+    setAlertStatus("info");
+    setAlertTitle("Creating a new key copy ...");
+    setAlertContent(undefined);
+    try {
+      const { keychainID } = parseURL(ROUTE_KEYCHAINS_VIEW);
+      const res = await fetch(API_KEYCOPIES_CREATE, {
+        method: "POST",
+        body: JSON.stringify({
+          keychainID,
+        }),
+      });
+      const decodedRes = await res.json();
+      if (decodedRes.errors) {
+        throw decodedRes.errors;
+      }
+      setAlertStatus("success");
+      setAlertTitle("Succesfully created a new copy");
+      setAlertContent(`The new key ID is "${decodedRes.data.KeyID}"`);
+      fetchKeyCopiesData();
+    } catch (err) {
+      const errContent = Array.isArray(err) ? err : (err as any).message;
+      setAlertStatus("error");
+      setAlertTitle("Failed creating a new copy");
       setAlertContent(errContent);
     }
   };
@@ -212,12 +241,17 @@ export default function KeychainsViewPage() {
           <Text mb={2} textStyle="2xl" style={{ fontWeight: 700 }}>
             Key copies
           </Text>
-          <Input
-            variant="outline"
-            placeholder="Filter by key ID or bearer ID ..."
-            onChange={handleFilterChange}
-            value={filterValue}
-          />
+          <HStack>
+            <Input
+              variant="outline"
+              placeholder="Filter by key ID or bearer name/ID ..."
+              onChange={handleFilterChange}
+              value={filterValue}
+            />
+            <Button colorPalette="green" onClick={createNewCopy}>
+              Create new copy
+            </Button>
+          </HStack>
         </Box>
         {keyCopiesData && (
           <Box as="section" mt={8}>

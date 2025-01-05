@@ -49,23 +49,3 @@ CREATE TABLE IF NOT EXISTS keygroups_keygroups (
   FOREIGN KEY (super_group_id) REFERENCES keygroups(group_id) ON DELETE CASCADE,
   FOREIGN KEY (sub_group_id) REFERENCES keygroups(group_id) ON DELETE CASCADE
 );
-
-SELECT keycopies.key_id, keycopies.date_created, staff.staff_id, staff.name FROM keycopies
-LEFT JOIN staff ON
-  staff.staff_id=keycopies.staff_id
-  AND keycopies.keychain_id = 'a7ba3f3a-528b-4325-83b8-6714a2969ebf'
-ORDER BY keycopies.date_created DESC
-LIMIT ? OFFSET ?
-
-SELECT keycopies.key_id, keycopies.date_created, staff.staff_id, staff.name FROM keycopies
-LEFT JOIN staff ON
-  staff.staff_id=keycopies.staff_id
-  AND keycopies.keychain_id = 'a7ba3f3a-528b-4325-83b8-6714a2969ebf'
-WHERE
-  keycopies.keychain_id LIKE CONCAT('%', 'a', '%')
-
-
-SELECT keycopies.key_id, keycopies.date_created, staff.staff_id, staff.name FROM keycopies
-		LEFT JOIN staff ON
-		  staff.staff_id = keycopies.staff_id
-		  AND keycopies.keychain_id = '48c2c6e7-68ce-4fca-9a63-af26006fee4e'
