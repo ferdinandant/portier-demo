@@ -1,0 +1,23 @@
+================================================================================
+ KEYCHAINS
+================================================================================
+
+GrandmasterKeychain
+  locks: []
+  groups: [GrandmasterGroup]
+
+================================================================================
+ GROUPS
+================================================================================
+
+GrandmasterGroup
+  locks: [privateJetKey]
+  groups: [OfficeBuildingGroup, WarehouseBuildingGroup]
+
+OfficeBuildingGroup
+  locks: [officeLock1, officeLock2]
+  groups: []
+
+WarehouseBuildingGroup
+  locks: [warehouseLock1, warehouseLock2]
+  groups: []
