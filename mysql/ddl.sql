@@ -7,17 +7,17 @@ CREATE TABLE IF NOT EXISTS keychains (
   date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- CREATE TABLE IF NOT EXISTS keygroups (
---   group_id VARCHAR(255) PRIMARY KEY,
---   description VARCHAR(255) NOT NULL,
---   date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
--- );
+CREATE TABLE IF NOT EXISTS keygroups (
+  group_id VARCHAR(255) PRIMARY KEY,
+  description VARCHAR(255) NOT NULL,
+  date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
--- CREATE TABLE IF NOT EXISTS locks (
---   lock_id VARCHAR(255) PRIMARY KEY,
---   date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
---   description VARCHAR(255) NOT NULL
--- );
+CREATE TABLE IF NOT EXISTS locks (
+  lock_id VARCHAR(255) PRIMARY KEY,
+  date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  description VARCHAR(255) NOT NULL
+);
 
 CREATE TABLE IF NOT EXISTS staffs (
   staff_id VARCHAR(255) PRIMARY KEY,
@@ -81,11 +81,3 @@ CREATE TABLE IF NOT EXISTS keygroups_keygroups (
   FOREIGN KEY (super_group_id) REFERENCES keygroups(group_id) ON DELETE CASCADE,
   FOREIGN KEY (sub_group_id) REFERENCES keygroups(group_id) ON DELETE CASCADE
 );
-
--- ================================================================================
--- ILLUSTRATION
--- ================================================================================
-
-`
-
-`
