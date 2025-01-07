@@ -7,18 +7,6 @@ CREATE TABLE IF NOT EXISTS keychains (
   date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS keygroups (
-  group_id VARCHAR(255) PRIMARY KEY,
-  description VARCHAR(255) NOT NULL,
-  date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS locks (
-  lock_id VARCHAR(255) PRIMARY KEY,
-  date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  description VARCHAR(255) NOT NULL
-);
-
 CREATE TABLE IF NOT EXISTS staffs (
   staff_id VARCHAR(255) PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
@@ -34,17 +22,21 @@ CREATE TABLE IF NOT EXISTS keycopies (
   FOREIGN KEY (staff_id) REFERENCES staffs(staff_id) ON DELETE SET NULL
 );
 
-CREATE TABLE IF NOT EXISTS keychains_keygroups (
-  group_id VARCHAR(255) NOT NULL,
-  lock_id VARCHAR(255) NOT NULL,
-  PRIMARY KEY (group_id, lock_id),
-  FOREIGN KEY (group_id) REFERENCES keygroups(group_id) ON DELETE CASCADE,
-  FOREIGN KEY (lock_id) REFERENCES locks(lock_id) ON DELETE CASCADE
+-- ================================================================================
+-- KEYCHAINS -> GROUPS/LOCKS
+-- ================================================================================
+
+CREATE TABLE IF NOT EXISTS keygroups (
+  group_id VARCHAR(255) PRIMARY KEY,
+  description VARCHAR(255) NOT NULL,
+  date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- ================================================================================
--- KEYCHAINS
--- ================================================================================
+CREATE TABLE IF NOT EXISTS locks (
+  lock_id VARCHAR(255) PRIMARY KEY,
+  date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  description VARCHAR(255) NOT NULL
+);
 
 CREATE TABLE IF NOT EXISTS keychains_keygroups (
   keychain_id VARCHAR(255) NOT NULL,
@@ -63,7 +55,7 @@ CREATE TABLE IF NOT EXISTS keychains_locks (
 );
 
 -- ================================================================================
--- KEYGROUPS
+-- KEYGROUPS -> GROUPS/LOCKS
 -- ================================================================================
 
 CREATE TABLE IF NOT EXISTS keygroups_locks (
