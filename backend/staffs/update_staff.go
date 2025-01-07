@@ -43,7 +43,7 @@ func UpdateStaff(mysqlConfig mysql.Config, reqJson []byte) (*UpdateStaffResponse
 		`
 		UPDATE staffs
 		SET name = ?
-		WHERE keychain_id = ?
+		WHERE staff_id = ?
 		`,
 		reqObj.Name,
 		reqObj.StaffID,
